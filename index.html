@@ -7,20 +7,19 @@
 <style>
 :root {
   --bg: #FBFAF8; --card: #FFFFFF; --ink: #1B1B20; --dim: #6E6C75;
-  --rule: #E3DFD8; --code-bg: #F4F2ED; --done-bg: #F0EDE8;
-  --yt: #FF0000; --ig: #E1306C; --tt: #000000;
-  --accent: #1B1B20;
+  --rule: #E3DFD8; --code-bg: #F4F2ED;
+  --yt: #FF0000; --ig: #E1306C; --tt: #000000; --xc: #1B1B20;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg: #131317; --card: #1B1B21; --ink: #EDECEA; --dim: #9B98A3;
-           --rule: #2C2C34; --code-bg: #212128; --done-bg: #1A1A22;
-           --tt: #EDECEA; --accent: #EDECEA; }
+           --rule: #2C2C34; --code-bg: #212128;
+           --tt: #EDECEA; --xc: #EDECEA; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; }
 body { background: var(--bg); color: var(--ink);
        font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-       -webkit-text-size-adjust: 100%; min-height: 100vh; }
+       -webkit-text-size-adjust: 100%; }
 
 /* ── password gate ── */
 #gate { display: flex; flex-direction: column; align-items: center;
@@ -30,43 +29,53 @@ body { background: var(--bg); color: var(--ink);
 #gate input[type="password"] {
   font: inherit; font-size: 1rem; padding: .5rem .8rem;
   border: 1px solid var(--rule); border-radius: 3px;
-  background: var(--card); color: var(--ink); outline: none;
-  width: 10rem;
+  background: var(--card); color: var(--ink); outline: none; width: 10rem;
 }
-#gate input[type="password"]:focus { border-color: var(--accent); }
+#gate input[type="password"]:focus { border-color: var(--ink); }
 #gate button {
   font: inherit; font-size: .9rem; padding: .5rem 1rem;
-  border: 1px solid var(--accent); border-radius: 3px;
-  background: var(--accent); color: var(--bg); cursor: pointer;
+  border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--ink); color: var(--bg); cursor: pointer;
 }
 #gate .err { color: #D32F2F; font-size: .85rem; margin-top: .6rem; min-height: 1.2em; }
 
-/* ── kit ── */
 #kit { display: none; }
-
 .wrap { max-width: 540px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
 
 header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: .3rem; }
 header p { color: var(--dim); font-size: .85rem; margin-bottom: .2rem; }
 
+/* ── tabs ── */
+.tabs { display: flex; gap: 0; margin-top: 1.2rem; border-bottom: 2px solid var(--rule); }
+.tab { font: inherit; font-size: .85rem; font-weight: 600; padding: .6rem 1rem;
+        border: none; background: none; color: var(--dim); cursor: pointer;
+        border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── stats bar ── */
 .stats { position: sticky; top: 0; z-index: 10; background: var(--bg);
           border-bottom: 1px solid var(--rule); padding: .6rem 0;
-          margin: 1rem 0 0; display: flex; gap: 1rem;
-          font-size: .82rem; font-variant-numeric: tabular-nums; }
+          display: flex; gap: 1rem; font-size: .82rem;
+          font-variant-numeric: tabular-nums; }
 .stats .s { display: flex; align-items: center; gap: .3rem; }
 .stats .dot { width: 8px; height: 8px; border-radius: 50%; }
 .stats .dot.yt { background: var(--yt); }
 .stats .dot.ig { background: var(--ig); }
 .stats .dot.tt { background: var(--tt); }
+.stats .dot.xd { background: var(--xc); }
 
+/* ── shared list styles ── */
 ol { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1px;
      background: var(--rule); margin-top: 0; }
 
-.short { background: var(--card); padding: 1rem; display: grid;
+.short, .xpost { background: var(--card); padding: 1rem; display: grid;
           grid-template-columns: 2.2rem 1fr; gap: .2rem .8rem;
           transition: opacity .2s; }
-.short.all-done { opacity: .4; }
-.short.all-done h2 { text-decoration: line-through; text-decoration-color: var(--dim); }
+.short.all-done, .xpost.all-done { opacity: .4; }
+.short.all-done h2, .xpost.all-done .xtext { text-decoration: line-through; text-decoration-color: var(--dim); }
 
 .num { font-size: .8rem; font-weight: 700; color: var(--hue);
         padding-top: .15rem; text-align: center;
@@ -79,21 +88,23 @@ h2 { font-size: 1rem; font-weight: 600; line-height: 1.3; margin-bottom: .15rem;
 .actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .5rem; }
 .btn { font: inherit; font-size: .8rem; padding: .35rem .65rem;
         border: 1px solid var(--rule); background: transparent; color: var(--ink);
-        border-radius: 3px; cursor: pointer; text-decoration: none;
-        white-space: nowrap; }
+        border-radius: 3px; cursor: pointer; text-decoration: none; white-space: nowrap; }
 .btn:active { transform: scale(.97); }
 .btn.dl { font-weight: 600; }
 .btn.ok { border-color: var(--hue); color: var(--hue); }
 
-.platforms { display: flex; gap: .8rem; margin-bottom: .4rem; }
+.platforms { display: flex; gap: .8rem; }
 .platforms label { display: flex; align-items: center; gap: .3rem;
                    font-size: .78rem; cursor: pointer; user-select: none; }
 .platforms input { width: 1rem; height: 1rem; margin: 0; }
-.platforms label:nth-child(1) input { accent-color: var(--yt); }
-.platforms label:nth-child(2) input { accent-color: var(--ig); }
-.platforms label:nth-child(3) input { accent-color: var(--tt); }
 
-.caption-box { font-size: .8rem; }
+/* video platforms coloring */
+.short .platforms label:nth-child(1) input { accent-color: var(--yt); }
+.short .platforms label:nth-child(2) input { accent-color: var(--ig); }
+.short .platforms label:nth-child(3) input { accent-color: var(--tt); }
+.xpost .platforms input { accent-color: var(--hue); }
+
+.caption-box { font-size: .8rem; margin-top: .4rem; }
 .caption-box summary { cursor: pointer; color: var(--dim); user-select: none; }
 .cap { background: var(--code-bg); border: 0; border-radius: 3px;
         padding: .6rem .7rem; margin-top: .4rem; font-size: .75rem; line-height: 1.45;
@@ -101,8 +112,19 @@ h2 { font-size: 1rem; font-weight: 600; line-height: 1.3; margin-bottom: .15rem;
         white-space: pre-wrap; overflow-wrap: anywhere; max-height: 10rem;
         overflow-y: auto; color: var(--dim); }
 
+/* ── X post specifics ── */
+.xmeta { display: flex; gap: .6rem; align-items: baseline; margin-bottom: .4rem; flex-wrap: wrap; }
+.xdate { font-size: .78rem; color: var(--dim); font-variant-numeric: tabular-nums; }
+.xtype { font-size: .7rem; font-weight: 700; text-transform: uppercase;
+          letter-spacing: .06em; color: var(--hue); }
+.xchars { font-size: .7rem; color: var(--dim); font-variant-numeric: tabular-nums; margin-left: auto; }
+.xtext { background: var(--code-bg); border: 0; border-radius: 3px;
+          padding: .6rem .7rem; margin: 0 0 .5rem; font-size: .82rem; line-height: 1.5;
+          font-family: inherit; white-space: pre-wrap; overflow-wrap: anywhere;
+          color: var(--ink); }
+
 @media (max-width: 400px) {
-  .short { grid-template-columns: 1.8rem 1fr; padding: .8rem .7rem; gap: .2rem .5rem; }
+  .short, .xpost { grid-template-columns: 1.8rem 1fr; padding: .8rem .7rem; gap: .2rem .5rem; }
   .btn { flex: 1 1 auto; text-align: center; font-size: .78rem; }
 }
 </style>
@@ -122,17 +144,22 @@ h2 { font-size: 1rem; font-weight: 600; line-height: 1.3; margin-bottom: .15rem;
 <div class="wrap">
   <header>
     <h1>Posting Kit</h1>
-    <p>33 explainer shorts. Download, copy the caption, post.</p>
-    <p>Ticks are saved on this device.</p>
+    <p>Download, copy, post, tick. Progress saved on this device.</p>
   </header>
 
-  <div class="stats">
-    <div class="s"><span class="dot yt"></span> <span id="c-yt">0</span>/33 YT</div>
-    <div class="s"><span class="dot ig"></span> <span id="c-ig">0</span>/33 IG</div>
-    <div class="s"><span class="dot tt"></span> <span id="c-tt">0</span>/33 TT</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="videos">Shorts (33)</button>
+    <button class="tab" data-tab="xposts">X Posts (48)</button>
   </div>
 
-  <ol>
+  <!-- ── Video shorts section ── -->
+  <div class="section active" id="sec-videos">
+    <div class="stats">
+      <div class="s"><span class="dot yt"></span> <span id="c-yt">0</span>/33 YT</div>
+      <div class="s"><span class="dot ig"></span> <span id="c-ig">0</span>/33 IG</div>
+      <div class="s"><span class="dot tt"></span> <span id="c-tt">0</span>/33 TT</div>
+    </div>
+    <ol id="video-list">
 <li class="short" data-id="Short-Sqrt2" style="--hue:#2E7D32">
   <div class="num">01</div>
   <div class="body">
@@ -1959,7 +1986,891 @@ If you enjoy these videos, you might like the Tryals app. Currently on the web a
     </details>
   </div>
 </li>
-  </ol>
+    </ol>
+  </div>
+
+  <!-- ── X posts section ── -->
+  <div class="section" id="sec-xposts">
+    <div class="stats">
+      <div class="s"><span class="dot xd"></span> <span id="c-x">0</span>/48 posted</div>
+    </div>
+    <ol id="x-list">
+<li class="xpost" data-id="x-stem_fgreen" style="--hue:#4CAF50">
+  <div class="num">01</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-20 Mon</span>
+      <span class="xtype">STEM</span>
+      <span class="xchars">159/280</span>
+    </div>
+    <pre class="xtext">Your brain doesn&#x27;t peak once and decline. It reorganises four times across your life, each shift opening a different kind of thinking.
+
+https://doi.org/10.1038/s41467-025-65974-8</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/stem_fgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_fgreen" style="--hue:#4CAF50">
+  <div class="num">02</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-21 Tue</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">176/280</span>
+    </div>
+    <pre class="xtext">Re-reading feels productive because the words look familiar. But recognising a page is not the same as being able to recall what it says. Close the book and try to say it back.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_fgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-social_ablue" style="--hue:#42A5F5">
+  <div class="num">03</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-22 Wed</span>
+      <span class="xtype">SOCIAL</span>
+      <span class="xchars">205/280</span>
+    </div>
+    <pre class="xtext">Dunbar correlated primate neocortex size with group size and landed on 150 as the human ceiling for real relationships. Five are close. Fifteen are trusted. The rest thin out fast.
+
+https://doi.org/10.1016/0047-2484(92)90081-J</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/social_ablue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_ablue" style="--hue:#42A5F5">
+  <div class="num">04</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-23 Thu</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">185/280</span>
+    </div>
+    <pre class="xtext">If you can re-read a chapter and feel fine, you probably aren&#x27;t learning. Real studying should feel slightly uncomfortable, because your brain is actually working to retrieve something.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_ablue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-humanities_ayellow" style="--hue:#FBC02D">
+  <div class="num">05</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-24 Fri</span>
+      <span class="xtype">HUMANITIES</span>
+      <span class="xchars">178/280</span>
+    </div>
+    <pre class="xtext">Writing, print, libraries, the telegraph, the internet. Each one rewired how knowledge travels, and each time most people alive didn&#x27;t notice the shift until it was already done.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/humanities_ayellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_1" style="--hue:#6E6C75">
+  <div class="num">06</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-25 Sat</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">261/280</span>
+    </div>
+    <pre class="xtext">Re-reading a page makes it feel familiar. Familiarity feels like knowing.
+
+It isn&#x27;t.
+
+Roediger &amp; Karpicke, 2006: students who re-read predicted they&#x27;d remember more. Students who self-tested actually did.
+
+Confidence and learning pointed in opposite directions.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_2" style="--hue:#6E6C75">
+  <div class="num">07</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-26 Sun</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">241/280</span>
+    </div>
+    <pre class="xtext">An octave sounds higher, but it&#x27;s the same note.
+
+Double the frequency and your ear hears the same pitch class. 220 Hz and 440 Hz are both A.
+
+Greek, Chinese, and Indian music theory each found this independently.
+
+It&#x27;s physics, not culture.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_ayellow" style="--hue:#FBC02D">
+  <div class="num">08</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-27 Mon</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">163/280</span>
+    </div>
+    <pre class="xtext">Don&#x27;t break the chain. Mark every day you study on a calendar. After a few days the chain itself becomes the motivation, because you don&#x27;t want to lose the streak.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_ayellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-arts_fred" style="--hue:#E53935">
+  <div class="num">09</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-28 Tue</span>
+      <span class="xtype">ARTS</span>
+      <span class="xchars">166/280</span>
+    </div>
+    <pre class="xtext">Three cone types in your retina, each tuned to a different slice of the spectrum. From just three signals, your brain mixes roughly a million distinguishable colours.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/arts_fred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_fred" style="--hue:#E53935">
+  <div class="num">10</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-29 Wed</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">161/280</span>
+    </div>
+    <pre class="xtext">Perfectionism kills learning. A rough first draft you can fix teaches you more than a blank page you spent three hours planning. Start badly. Improve from there.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_fred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-stem_pgreen" style="--hue:#4CAF50">
+  <div class="num">11</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-30 Thu</span>
+      <span class="xtype">STEM</span>
+      <span class="xchars">178/280</span>
+    </div>
+    <pre class="xtext">Ebbinghaus memorised nonsense syllables and timed how fast he forgot them. Within twenty minutes, 42% was gone. By the next day, two thirds had vanished.
+
+https://psychclassics.yorku.ca/Ebbinghaus/index.htm</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/stem_pgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_pgreen" style="--hue:#4CAF50">
+  <div class="num">12</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">07-31 Fri</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">185/280</span>
+    </div>
+    <pre class="xtext">Set a timer for 25 minutes and work on one thing. When it rings, stop. Five minutes off, then another round. The constraint makes starting easier because you&#x27;re not committing to hours.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_pgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_3" style="--hue:#6E6C75">
+  <div class="num">13</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-01 Sat</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">248/280</span>
+    </div>
+    <pre class="xtext">You&#x27;ll forget most of what you read today by tomorrow.
+
+Not from inattention. It&#x27;s the default. Ebbinghaus mapped it in 1885: memory falls off a cliff in the first 24 hours, then flattens.
+
+The fix was never focusing harder. It&#x27;s coming back to it.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_4" style="--hue:#6E6C75">
+  <div class="num">14</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-02 Sun</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">258/280</span>
+    </div>
+    <pre class="xtext">For centuries the best blue in Europe came from one mountain range in Afghanistan.
+
+Ground lapis lazuli, hauled across a continent, sold by weight above gold.
+
+Renaissance contracts specified the blue in writing. The pigment could cost more than the painter.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-social_gblue" style="--hue:#42A5F5">
+  <div class="num">15</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-03 Mon</span>
+      <span class="xtype">SOCIAL</span>
+      <span class="xchars">216/280</span>
+    </div>
+    <pre class="xtext">Darley and Latane staged emergencies in front of one person and then in front of groups. Alone, 85% helped. With four others watching, only 31% did. Responsibility doesn&#x27;t add up. It divides.
+
+https://doi.org/10.1037/h0025589</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/social_gblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_gblue" style="--hue:#42A5F5">
+  <div class="num">16</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-04 Tue</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">198/280</span>
+    </div>
+    <pre class="xtext">Sleep is not downtime. During deep sleep your brain replays the day&#x27;s learning and files it into long-term storage. Cutting a night short mainly cuts REM, which is where the consolidation stacks up.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_gblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-humanities_ayellow2" style="--hue:#FBC02D">
+  <div class="num">17</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-05 Wed</span>
+      <span class="xtype">HUMANITIES</span>
+      <span class="xchars">190/280</span>
+    </div>
+    <pre class="xtext">About 7,000 languages are alive right now. Nearly half are expected to fall silent this century. Each one carries a way of counting, naming colours, or marking time that nothing else stores.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/humanities_ayellow2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_ayellow2" style="--hue:#FBC02D">
+  <div class="num">18</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-06 Thu</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">168/280</span>
+    </div>
+    <pre class="xtext">The worst study advice: &quot;just re-read it until it clicks.&quot; Recognition is not recall. Feeling like you know it is not the same as proving you do. Test yourself instead.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_ayellow2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-arts_hred" style="--hue:#E53935">
+  <div class="num">19</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-07 Fri</span>
+      <span class="xtype">ARTS</span>
+      <span class="xchars">190/280</span>
+    </div>
+    <pre class="xtext">Ultramarine came from lapis lazuli mined in a single Afghan valley. It crossed a continent and cost more per gram than gold. Renaissance painters had it written into their contracts by name.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/arts_hred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_5" style="--hue:#6E6C75">
+  <div class="num">20</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-08 Sat</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">232/280</span>
+    </div>
+    <pre class="xtext">Asch showed people two lines and asked which was longer. The answer was obvious.
+
+Then he filled the room with actors giving the wrong one.
+
+About 75% caved at least once, denying what they could plainly see rather than stand alone.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_6" style="--hue:#6E6C75">
+  <div class="num">21</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-09 Sun</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">234/280</span>
+    </div>
+    <pre class="xtext">There are roughly 7,000 languages alive right now.
+
+About half aren&#x27;t expected to survive the century.
+
+When one goes it takes its only copy of something: a way of counting, of naming a colour, of marking time. Nothing else stores it.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_hred" style="--hue:#E53935">
+  <div class="num">22</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-10 Mon</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">210/280</span>
+    </div>
+    <pre class="xtext">Your phone is not on your side when you study. Even face-down on the desk, its presence drains attention. A 2017 study found that people scored worse on cognitive tasks just because their phone was in the room.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_hred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-stem_sgreen" style="--hue:#4CAF50">
+  <div class="num">23</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-11 Tue</span>
+      <span class="xtype">STEM</span>
+      <span class="xchars">215/280</span>
+    </div>
+    <pre class="xtext">Spacing your study sessions out means you forget a little between them. That forgetting is the point. Struggling to retrieve something strengthens the memory in a way easy review never does.
+
+https://doi.org/10.1037/0033-2909.132.3.354</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/stem_sgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_sgreen" style="--hue:#4CAF50">
+  <div class="num">24</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-12 Wed</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">183/280</span>
+    </div>
+    <pre class="xtext">Taking notes is not transcribing. Write what you understand, not what was said. If you can&#x27;t put it in your own words, you haven&#x27;t learned it yet. That gap is the signal to slow down.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_sgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-social_pblue" style="--hue:#42A5F5">
+  <div class="num">25</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-13 Thu</span>
+      <span class="xtype">SOCIAL</span>
+      <span class="xchars">208/280</span>
+    </div>
+    <pre class="xtext">Tetlock tracked 82,000 expert predictions over two decades. Specialists with one big idea did worse than simple base rates. Generalists who updated their views beat them consistently.
+
+https://doi.org/10.1515/9781400824724</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/social_pblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_pblue" style="--hue:#42A5F5">
+  <div class="num">26</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-14 Fri</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">201/280</span>
+    </div>
+    <pre class="xtext">Studying for a test you hate: start with past papers. Work backwards from the questions to find out what you actually need to know, then study only that. Targeted beats thorough when motivation is low.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_pblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_7" style="--hue:#6E6C75">
+  <div class="num">27</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-15 Sat</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">184/280</span>
+    </div>
+    <pre class="xtext">Your eyes have three cone types.
+
+Three.
+
+From that: roughly a million distinguishable colours.
+
+Every colour you have ever seen, every sunset, every painting, is three numbers, mixed.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-text_only_8" style="--hue:#6E6C75">
+  <div class="num">28</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-16 Sun</span>
+      <span class="xtype">TEXT ONLY</span>
+      <span class="xchars">259/280</span>
+    </div>
+    <pre class="xtext">Dunbar&#x27;s number, 150 relationships, is one of the most repeated figures in pop psychology.
+
+It comes from correlating neocortex size with group size in primates.
+
+The same journal family later published a direct challenge to it.
+
+Repetition isn&#x27;t replication.</pre>
+    <div class="actions">
+      
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-humanities_deyellow" style="--hue:#FBC02D">
+  <div class="num">29</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-17 Mon</span>
+      <span class="xtype">HUMANITIES</span>
+      <span class="xchars">173/280</span>
+    </div>
+    <pre class="xtext">For most of history, reading was rare. Manuscripts were hand-copied by monks, one at a time. A single book could take months. Gutenberg&#x27;s press changed that in a generation.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/humanities_deyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_deyellow" style="--hue:#FBC02D">
+  <div class="num">30</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-18 Tue</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">190/280</span>
+    </div>
+    <pre class="xtext">How to read a textbook: don&#x27;t start at page one. Read the chapter summary first, then the headings, then the first sentence of each section. Now you have a map. Go back and fill in the gaps.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_deyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-arts_mred" style="--hue:#E53935">
+  <div class="num">31</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-19 Wed</span>
+      <span class="xtype">ARTS</span>
+      <span class="xchars">191/280</span>
+    </div>
+    <pre class="xtext">An octave is a 2:1 frequency ratio. Double the vibrations per second and your ear hears the same note, one register higher. Greek, Chinese, and Indian traditions all found this independently.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/arts_mred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_mred" style="--hue:#E53935">
+  <div class="num">32</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-20 Thu</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">180/280</span>
+    </div>
+    <pre class="xtext">Study with your hands. Draw a diagram, build a model, write the steps on cards and shuffle them. Physical engagement forces your brain to process the material, not just look at it.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_mred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-stem_sgreen2" style="--hue:#4CAF50">
+  <div class="num">33</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-21 Fri</span>
+      <span class="xtype">STEM</span>
+      <span class="xchars">208/280</span>
+    </div>
+    <pre class="xtext">A night of sleep runs four to six 90-minute cycles, each with four stages. Deep sleep files new facts away. REM stacks up towards morning, so a short night cuts it disproportionately.
+
+https://www.ncbi.nlm.nih.gov/books/NBK19956/</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/stem_sgreen2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_sgreen2" style="--hue:#4CAF50">
+  <div class="num">34</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-24 Mon</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">179/280</span>
+    </div>
+    <pre class="xtext">Teach what you learned to someone who doesn&#x27;t care. If you can make it make sense to them, you understand it. Where you stumble is exactly where your own understanding has a hole.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_sgreen2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-social_wblue" style="--hue:#42A5F5">
+  <div class="num">35</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-25 Tue</span>
+      <span class="xtype">SOCIAL</span>
+      <span class="xchars">195/280</span>
+    </div>
+    <pre class="xtext">Asch&#x27;s conformity experiments: people denied what their own eyes told them rather than disagree with a room full of strangers. About 75% caved at least once. One dissenter was enough to break it.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/social_wblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_wblue" style="--hue:#42A5F5">
+  <div class="num">36</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-26 Wed</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">202/280</span>
+    </div>
+    <pre class="xtext">The two-minute rule: if a task takes less than two minutes, do it now. For studying, it means open the book, read one paragraph, write one flashcard. Starting is the hardest part, and this sidesteps it.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_wblue.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-humanities_dyellow" style="--hue:#FBC02D">
+  <div class="num">37</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-27 Thu</span>
+      <span class="xtype">HUMANITIES</span>
+      <span class="xchars">161/280</span>
+    </div>
+    <pre class="xtext">Five languages, English, Mandarin, Hindi, Spanish, and Arabic, account for roughly four billion speakers. The other 6,995 share the rest. Scale is wildly uneven.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/humanities_dyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_dyellow" style="--hue:#FBC02D">
+  <div class="num">38</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-28 Fri</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">187/280</span>
+    </div>
+    <pre class="xtext">Space it out. Study something on day one, again on day three, again on day seven. Each gap forces your brain to work harder to retrieve it, and that effort is what makes the memory stick.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_dyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-arts_mred2" style="--hue:#E53935">
+  <div class="num">39</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">08-31 Mon</span>
+      <span class="xtype">ARTS</span>
+      <span class="xchars">194/280</span>
+    </div>
+    <pre class="xtext">Art broke its own rules five times: Renaissance perspective, Baroque drama, Impressionist light, Cubist fragmentation, Abstract Expressionist gesture. Each generation rejected the one before it.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/arts_mred2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_mred2" style="--hue:#E53935">
+  <div class="num">40</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-01 Tue</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">189/280</span>
+    </div>
+    <pre class="xtext">One subject. One hour. No switching. Multitasking between subjects feels efficient but each switch costs minutes of re-orientation. Depth beats breadth when you&#x27;re actually trying to learn.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_mred2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-stem_tgreen" style="--hue:#4CAF50">
+  <div class="num">41</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-02 Wed</span>
+      <span class="xtype">STEM</span>
+      <span class="xchars">203/280</span>
+    </div>
+    <pre class="xtext">Roediger and Karpicke gave two groups the same material and the same time. One re-read it. The other tested themselves. A week later the testers recalled 61%, the re-readers 40%.
+
+https://doi.org/10.1111/j.1467-9280.2006.01693.x</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/stem_tgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_tgreen" style="--hue:#4CAF50">
+  <div class="num">42</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-03 Thu</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">158/280</span>
+    </div>
+    <pre class="xtext">Build a study ritual. Same time, same place, same first action. Your brain learns the cue and drops into focus faster. It&#x27;s not discipline. It&#x27;s a habit loop.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_tgreen.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-social_wblue2" style="--hue:#42A5F5">
+  <div class="num">43</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-04 Fri</span>
+      <span class="xtype">SOCIAL</span>
+      <span class="xchars">181/280</span>
+    </div>
+    <pre class="xtext">Milgram, Asch, Zimbardo, Rosenhan, Darley and Latane. Five studies, five decades, one theme: people do things they wouldn&#x27;t predict of themselves when the situation is set up right.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/social_wblue2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_wblue2" style="--hue:#42A5F5">
+  <div class="num">44</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-07 Mon</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">168/280</span>
+    </div>
+    <pre class="xtext">Stop studying in silence. Explain out loud what you just read. Hearing yourself stumble over a sentence tells you where the gaps are in a way silent reading never does.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_wblue2.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-humanities_oyellow" style="--hue:#FBC02D">
+  <div class="num">45</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-08 Tue</span>
+      <span class="xtype">HUMANITIES</span>
+      <span class="xchars">170/280</span>
+    </div>
+    <pre class="xtext">Twenty-three languages cover roughly half the world&#x27;s speakers. The remaining 6,977 languages share the other half. One language in a hundred carries the weight of fifty.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/humanities_oyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_oyellow" style="--hue:#FBC02D">
+  <div class="num">46</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-09 Wed</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">192/280</span>
+    </div>
+    <pre class="xtext">Write the exam yourself. Before you sit it, draft ten questions you think they&#x27;ll ask, then answer them. If your guesses are close, you understand the material. If not, you know where to look.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_oyellow.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-arts_tred" style="--hue:#E53935">
+  <div class="num">47</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-10 Thu</span>
+      <span class="xtype">ARTS</span>
+      <span class="xchars">189/280</span>
+    </div>
+    <pre class="xtext">Colour is wavelength. Red is long, violet is short, and everything you see is your brain sorting a few hundred nanometres of electromagnetic radiation into a million distinguishable shades.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/arts_tred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li><li class="xpost" data-id="x-tip_tred" style="--hue:#E53935">
+  <div class="num">48</div>
+  <div class="body">
+    <div class="xmeta">
+      <span class="xdate">09-11 Fri</span>
+      <span class="xtype">STUDY TIP</span>
+      <span class="xchars">192/280</span>
+    </div>
+    <pre class="xtext">The night before an exam: don&#x27;t try to learn new material. Review what you already know, write down the three things most likely to come up, and go to sleep. Sleep consolidates. Panic doesn&#x27;t.</pre>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/posts/tip_tred.png" download>Image</a>
+      <button class="btn copy xcopy" type="button">Copy tweet</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="x"><span>Posted</span></label>
+    </div>
+  </div>
+</li>
+    </ol>
+  </div>
+
 </div>
 </div>
 
@@ -1969,13 +2880,8 @@ If you enjoy these videos, you might like the Tryals app. Currently on the web a
   const AUTH_KEY = "pk-auth";
 
   async function sha256(str) {
-    const buf = await crypto.subtle.digest("SHA-256",
-      new TextEncoder().encode(str));
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
-  }
-
-  async function check(pw) {
-    return (await sha256(pw)) === HASH;
   }
 
   async function unlock() {
@@ -1984,15 +2890,12 @@ If you enjoy these videos, you might like the Tryals app. Currently on the web a
     initKit();
   }
 
-  // check stored auth
-  if (sessionStorage.getItem(AUTH_KEY) === "1") {
-    unlock();
-  }
+  if (sessionStorage.getItem(AUTH_KEY) === "1") unlock();
 
   document.getElementById("pw-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const pw = document.getElementById("pw").value;
-    if (await check(pw)) {
+    if (await sha256(pw) === HASH) {
       sessionStorage.setItem(AUTH_KEY, "1");
       unlock();
     } else {
@@ -2003,16 +2906,27 @@ If you enjoy these videos, you might like the Tryals app. Currently on the web a
   });
 
   function initKit() {
-    const KEY = "posting-kit-v1";
-    const state = JSON.parse(localStorage.getItem(KEY) || "{}");
-    function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
-    const items = [...document.querySelectorAll(".short")];
+    // ── Tabs ──
+    const tabs = document.querySelectorAll(".tab");
+    const sections = document.querySelectorAll(".section");
+    tabs.forEach(t => t.addEventListener("click", () => {
+      tabs.forEach(b => b.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      t.classList.add("active");
+      document.getElementById("sec-" + t.dataset.tab).classList.add("active");
+    }));
 
-    function paint() {
+    // ── Video shorts state ──
+    const VK = "posting-kit-v1";
+    const vState = JSON.parse(localStorage.getItem(VK) || "{}");
+    function vSave() { localStorage.setItem(VK, JSON.stringify(vState)); }
+    const vItems = [...document.querySelectorAll(".short")];
+
+    function vPaint() {
       let yt=0, ig=0, tt=0;
-      for (const li of items) {
+      for (const li of vItems) {
         const id = li.dataset.id;
-        const s = state[id] || {};
+        const s = vState[id] || {};
         li.querySelector('[data-plat="youtube"]').checked = !!s.youtube;
         li.querySelector('[data-plat="instagram"]').checked = !!s.instagram;
         li.querySelector('[data-plat="tiktok"]').checked = !!s.tiktok;
@@ -2026,30 +2940,68 @@ If you enjoy these videos, you might like the Tryals app. Currently on the web a
       document.getElementById("c-tt").textContent = tt;
     }
 
-    for (const li of items) {
+    for (const li of vItems) {
       const id = li.dataset.id;
       for (const cb of li.querySelectorAll(".platforms input")) {
         cb.addEventListener("change", () => {
-          if (!state[id]) state[id] = {};
-          state[id][cb.dataset.plat] = cb.checked;
-          save(); paint();
+          if (!vState[id]) vState[id] = {};
+          vState[id][cb.dataset.plat] = cb.checked;
+          vSave(); vPaint();
         });
       }
       for (const btn of li.querySelectorAll(".copy")) {
         btn.addEventListener("click", async () => {
           const pre = li.querySelector(".cap");
           const text = pre.getAttribute("data-" + btn.dataset.platform) || pre.textContent;
-          try { await navigator.clipboard.writeText(text); }
-          catch { const t = document.createElement("textarea");
-                   t.value = text; document.body.appendChild(t); t.select();
-                   document.execCommand("copy"); t.remove(); }
-          const was = btn.textContent;
-          btn.textContent = "Copied"; btn.classList.add("ok");
-          setTimeout(() => { btn.textContent = was; btn.classList.remove("ok"); }, 1200);
+          await copyText(text, btn);
         });
       }
     }
-    paint();
+    vPaint();
+
+    // ── X posts state ──
+    const XK = "posting-kit-x";
+    const xState = JSON.parse(localStorage.getItem(XK) || "{}");
+    function xSave() { localStorage.setItem(XK, JSON.stringify(xState)); }
+    const xItems = [...document.querySelectorAll(".xpost")];
+
+    function xPaint() {
+      let count = 0;
+      for (const li of xItems) {
+        const id = li.dataset.id;
+        const posted = !!xState[id];
+        li.querySelector('[data-plat="x"]').checked = posted;
+        if (posted) count++;
+        li.classList.toggle("all-done", posted);
+      }
+      document.getElementById("c-x").textContent = count;
+    }
+
+    for (const li of xItems) {
+      const id = li.dataset.id;
+      li.querySelector('[data-plat="x"]').addEventListener("change", (e) => {
+        if (e.target.checked) xState[id] = true; else delete xState[id];
+        xSave(); xPaint();
+      });
+      const copyBtn = li.querySelector(".xcopy");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", async () => {
+          const text = li.querySelector(".xtext").textContent;
+          await copyText(text, copyBtn);
+        });
+      }
+    }
+    xPaint();
+  }
+
+  async function copyText(text, btn) {
+    try { await navigator.clipboard.writeText(text); }
+    catch { const t = document.createElement("textarea");
+             t.value = text; document.body.appendChild(t); t.select();
+             document.execCommand("copy"); t.remove(); }
+    const was = btn.textContent;
+    btn.textContent = "Copied"; btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = was; btn.classList.remove("ok"); }, 1200);
   }
 })();
 </script>
