@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Posting Kit</title>
+<style>
+:root {
+  --bg: #FBFAF8; --card: #FFFFFF; --ink: #1B1B20; --dim: #6E6C75;
+  --rule: #E3DFD8; --code-bg: #F4F2ED; --done-bg: #F0EDE8;
+  --yt: #FF0000; --ig: #E1306C; --tt: #000000;
+  --accent: #1B1B20;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #131317; --card: #1B1B21; --ink: #EDECEA; --dim: #9B98A3;
+           --rule: #2C2C34; --code-bg: #212128; --done-bg: #1A1A22;
+           --tt: #EDECEA; --accent: #EDECEA; }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--ink);
+       font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+       -webkit-text-size-adjust: 100%; min-height: 100vh; }
+
+/* ── password gate ── */
+#gate { display: flex; flex-direction: column; align-items: center;
+         justify-content: center; min-height: 80vh; padding: 2rem; }
+#gate h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; }
+#gate form { display: flex; gap: .5rem; }
+#gate input[type="password"] {
+  font: inherit; font-size: 1rem; padding: .5rem .8rem;
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--card); color: var(--ink); outline: none;
+  width: 10rem;
+}
+#gate input[type="password"]:focus { border-color: var(--accent); }
+#gate button {
+  font: inherit; font-size: .9rem; padding: .5rem 1rem;
+  border: 1px solid var(--accent); border-radius: 3px;
+  background: var(--accent); color: var(--bg); cursor: pointer;
+}
+#gate .err { color: #D32F2F; font-size: .85rem; margin-top: .6rem; min-height: 1.2em; }
+
+/* ── kit ── */
+#kit { display: none; }
+
+.wrap { max-width: 540px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
+
+header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: .3rem; }
+header p { color: var(--dim); font-size: .85rem; margin-bottom: .2rem; }
+
+.stats { position: sticky; top: 0; z-index: 10; background: var(--bg);
+          border-bottom: 1px solid var(--rule); padding: .6rem 0;
+          margin: 1rem 0 0; display: flex; gap: 1rem;
+          font-size: .82rem; font-variant-numeric: tabular-nums; }
+.stats .s { display: flex; align-items: center; gap: .3rem; }
+.stats .dot { width: 8px; height: 8px; border-radius: 50%; }
+.stats .dot.yt { background: var(--yt); }
+.stats .dot.ig { background: var(--ig); }
+.stats .dot.tt { background: var(--tt); }
+
+ol { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1px;
+     background: var(--rule); margin-top: 0; }
+
+.short { background: var(--card); padding: 1rem; display: grid;
+          grid-template-columns: 2.2rem 1fr; gap: .2rem .8rem;
+          transition: opacity .2s; }
+.short.all-done { opacity: .4; }
+.short.all-done h2 { text-decoration: line-through; text-decoration-color: var(--dim); }
+
+.num { font-size: .8rem; font-weight: 700; color: var(--hue);
+        padding-top: .15rem; text-align: center;
+        font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+h2 { font-size: 1rem; font-weight: 600; line-height: 1.3; margin-bottom: .15rem; }
+.field { font-size: .72rem; color: var(--dim); text-transform: uppercase;
+          letter-spacing: .06em; margin-bottom: .6rem; }
+
+.actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .5rem; }
+.btn { font: inherit; font-size: .8rem; padding: .35rem .65rem;
+        border: 1px solid var(--rule); background: transparent; color: var(--ink);
+        border-radius: 3px; cursor: pointer; text-decoration: none;
+        white-space: nowrap; }
+.btn:active { transform: scale(.97); }
+.btn.dl { font-weight: 600; }
+.btn.ok { border-color: var(--hue); color: var(--hue); }
+
+.platforms { display: flex; gap: .8rem; margin-bottom: .4rem; }
+.platforms label { display: flex; align-items: center; gap: .3rem;
+                   font-size: .78rem; cursor: pointer; user-select: none; }
+.platforms input { width: 1rem; height: 1rem; margin: 0; }
+.platforms label:nth-child(1) input { accent-color: var(--yt); }
+.platforms label:nth-child(2) input { accent-color: var(--ig); }
+.platforms label:nth-child(3) input { accent-color: var(--tt); }
+
+.caption-box { font-size: .8rem; }
+.caption-box summary { cursor: pointer; color: var(--dim); user-select: none; }
+.cap { background: var(--code-bg); border: 0; border-radius: 3px;
+        padding: .6rem .7rem; margin-top: .4rem; font-size: .75rem; line-height: 1.45;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap; overflow-wrap: anywhere; max-height: 10rem;
+        overflow-y: auto; color: var(--dim); }
+
+@media (max-width: 400px) {
+  .short { grid-template-columns: 1.8rem 1fr; padding: .8rem .7rem; gap: .2rem .5rem; }
+  .btn { flex: 1 1 auto; text-align: center; font-size: .78rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Posting Kit</h1>
+  <form id="pw-form">
+    <input type="password" id="pw" placeholder="Password" autocomplete="off" autofocus>
+    <button type="submit">Enter</button>
+  </form>
+  <div class="err" id="pw-err"></div>
+</div>
+
+<div id="kit">
+<div class="wrap">
+  <header>
+    <h1>Posting Kit</h1>
+    <p>33 explainer shorts. Download, copy the caption, post.</p>
+    <p>Ticks are saved on this device.</p>
+  </header>
+
+  <div class="stats">
+    <div class="s"><span class="dot yt"></span> <span id="c-yt">0</span>/33 YT</div>
+    <div class="s"><span class="dot ig"></span> <span id="c-ig">0</span>/33 IG</div>
+    <div class="s"><span class="dot tt"></span> <span id="c-tt">0</span>/33 TT</div>
+  </div>
+
+  <ol>
+<li class="short" data-id="Short-Sqrt2" style="--hue:#2E7D32">
+  <div class="num">01</div>
+  <div class="body">
+    <h2>The proof that √2 is irrational, without algebra</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Sqrt2.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The proof that √2 is irrational, without algebra.
+
+Sources:
+Stanley Tennenbaum&#x27;s geometric proof (c. 1950s), reported in J. H. Conway, &quot;The Power of Mathematics&quot;, in Power (Darwin College Lectures 16), ed. A. Blackwell &amp; D. MacKay, Cambridge University Press, 2006.
+S. J. Miller &amp; D. Montague, &quot;Picturing Irrationality&quot;, Mathematics Magazine 85(2), 110–114 (2012). doi:10.4169/math.mag.85.2.110
+Euclid, Elements, Book X.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #proof #irrational #numbertheory #manim #shorts" data-instagram="The proof that √2 is irrational, without algebra.
+
+Sources:
+Stanley Tennenbaum&#x27;s geometric proof (c. 1950s), reported in J. H. Conway, &quot;The Power of Mathematics&quot;, in Power (Darwin College Lectures 16), ed. A. Blackwell &amp; D. MacKay, Cambridge University Press, 2006.
+S. J. Miller &amp; D. Montague, &quot;Picturing Irrationality&quot;, Mathematics Magazine 85(2), 110–114 (2012). doi:10.4169/math.mag.85.2.110
+Euclid, Elements, Book X.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #proof #irrational #numbertheory #manim #shorts" data-tiktok="The proof that √2 is irrational, without algebra.
+
+Sources:
+Stanley Tennenbaum&#x27;s geometric proof (c. 1950s), reported in J. H. Conway, &quot;The Power of Mathematics&quot;, in Power (Darwin College Lectures 16), ed. A. Blackwell &amp; D. MacKay, Cambridge University Press, 2006.
+S. J. Miller &amp; D. Montague, &quot;Picturing Irrationality&quot;, Mathematics Magazine 85(2), 110–114 (2012). doi:10.4169/math.mag.85.2.110
+Euclid, Elements, Book X.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #proof #irrational #numbertheory #manim #shorts">The proof that √2 is irrational, without algebra.
+
+Sources:
+Stanley Tennenbaum&#x27;s geometric proof (c. 1950s), reported in J. H. Conway, &quot;The Power of Mathematics&quot;, in Power (Darwin College Lectures 16), ed. A. Blackwell &amp; D. MacKay, Cambridge University Press, 2006.
+S. J. Miller &amp; D. Montague, &quot;Picturing Irrationality&quot;, Mathematics Magazine 85(2), 110–114 (2012). doi:10.4169/math.mag.85.2.110
+Euclid, Elements, Book X.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #proof #irrational #numbertheory #manim #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Ligo" style="--hue:#1565C0">
+  <div class="num">02</div>
+  <div class="body">
+    <h2>GW150914: the signal a thousandth of a proton wide</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Ligo.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="GW150914: the signal a thousandth of a proton wide.
+
+Sources:
+B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), &quot;Observation of Gravitational Waves from a Binary Black Hole Merger&quot;, Physical Review Letters 116, 061102 (2016). doi:10.1103/PhysRevLett.116.061102
+B. P. Abbott et al., &quot;Properties of the Binary Black Hole Merger GW150914&quot;, Physical Review Letters 116, 241102 (2016).
+Gravitational Wave Open Science Center, GW150914 event data: https://gwosc.org/events/GW150914/
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #gravitationalwaves #ligo #blackholes #astronomy #shorts" data-instagram="GW150914: the signal a thousandth of a proton wide.
+
+Sources:
+B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), &quot;Observation of Gravitational Waves from a Binary Black Hole Merger&quot;, Physical Review Letters 116, 061102 (2016). doi:10.1103/PhysRevLett.116.061102
+B. P. Abbott et al., &quot;Properties of the Binary Black Hole Merger GW150914&quot;, Physical Review Letters 116, 241102 (2016).
+Gravitational Wave Open Science Center, GW150914 event data: https://gwosc.org/events/GW150914/
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #gravitationalwaves #ligo #blackholes #astronomy #shorts" data-tiktok="GW150914: the signal a thousandth of a proton wide.
+
+Sources:
+B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), &quot;Observation of Gravitational Waves from a Binary Black Hole Merger&quot;, Physical Review Letters 116, 061102 (2016). doi:10.1103/PhysRevLett.116.061102
+B. P. Abbott et al., &quot;Properties of the Binary Black Hole Merger GW150914&quot;, Physical Review Letters 116, 241102 (2016).
+Gravitational Wave Open Science Center, GW150914 event data: https://gwosc.org/events/GW150914/
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #gravitationalwaves #ligo #blackholes #astronomy #shorts">GW150914: the signal a thousandth of a proton wide.
+
+Sources:
+B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), &quot;Observation of Gravitational Waves from a Binary Black Hole Merger&quot;, Physical Review Letters 116, 061102 (2016). doi:10.1103/PhysRevLett.116.061102
+B. P. Abbott et al., &quot;Properties of the Binary Black Hole Merger GW150914&quot;, Physical Review Letters 116, 241102 (2016).
+Gravitational Wave Open Science Center, GW150914 event data: https://gwosc.org/events/GW150914/
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #gravitationalwaves #ligo #blackholes #astronomy #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Antikythera" style="--hue:#E65100">
+  <div class="num">03</div>
+  <div class="body">
+    <h2>The 2,000 year old machine that predicted eclipses</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Antikythera.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The 2,000 year old machine that predicted eclipses.
+
+Sources:
+T. Freeth et al., &quot;Decoding the ancient Greek astronomical calculator known as the Antikythera Mechanism&quot;, Nature 444, 587–591 (2006). doi:10.1038/nature05357
+T. Freeth, A. Jones, J. M. Steele &amp; Y. Bitsakis, &quot;Calendars with Olympiad display and eclipse prediction on the Antikythera Mechanism&quot;, Nature 454, 614–617 (2008).
+T. Freeth et al., &quot;A Model of the Cosmos in the ancient Greek Antikythera Mechanism&quot;, Scientific Reports 11, 5821 (2021). doi:10.1038/s41598-021-84310-w
+M. T. Wright, &quot;The Antikythera Mechanism and the early history of the moon-phase display&quot;, Antiquarian Horology 29(3), 319–329 (2006).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #archaeology #ancientgreece #antikythera #historyofscience #shorts" data-instagram="The 2,000 year old machine that predicted eclipses.
+
+Sources:
+T. Freeth et al., &quot;Decoding the ancient Greek astronomical calculator known as the Antikythera Mechanism&quot;, Nature 444, 587–591 (2006). doi:10.1038/nature05357
+T. Freeth, A. Jones, J. M. Steele &amp; Y. Bitsakis, &quot;Calendars with Olympiad display and eclipse prediction on the Antikythera Mechanism&quot;, Nature 454, 614–617 (2008).
+T. Freeth et al., &quot;A Model of the Cosmos in the ancient Greek Antikythera Mechanism&quot;, Scientific Reports 11, 5821 (2021). doi:10.1038/s41598-021-84310-w
+M. T. Wright, &quot;The Antikythera Mechanism and the early history of the moon-phase display&quot;, Antiquarian Horology 29(3), 319–329 (2006).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #archaeology #ancientgreece #antikythera #historyofscience #shorts" data-tiktok="The 2,000 year old machine that predicted eclipses.
+
+Sources:
+T. Freeth et al., &quot;Decoding the ancient Greek astronomical calculator known as the Antikythera Mechanism&quot;, Nature 444, 587–591 (2006). doi:10.1038/nature05357
+T. Freeth, A. Jones, J. M. Steele &amp; Y. Bitsakis, &quot;Calendars with Olympiad display and eclipse prediction on the Antikythera Mechanism&quot;, Nature 454, 614–617 (2008).
+T. Freeth et al., &quot;A Model of the Cosmos in the ancient Greek Antikythera Mechanism&quot;, Scientific Reports 11, 5821 (2021). doi:10.1038/s41598-021-84310-w
+M. T. Wright, &quot;The Antikythera Mechanism and the early history of the moon-phase display&quot;, Antiquarian Horology 29(3), 319–329 (2006).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #archaeology #ancientgreece #antikythera #historyofscience #shorts">The 2,000 year old machine that predicted eclipses.
+
+Sources:
+T. Freeth et al., &quot;Decoding the ancient Greek astronomical calculator known as the Antikythera Mechanism&quot;, Nature 444, 587–591 (2006). doi:10.1038/nature05357
+T. Freeth, A. Jones, J. M. Steele &amp; Y. Bitsakis, &quot;Calendars with Olympiad display and eclipse prediction on the Antikythera Mechanism&quot;, Nature 454, 614–617 (2008).
+T. Freeth et al., &quot;A Model of the Cosmos in the ancient Greek Antikythera Mechanism&quot;, Scientific Reports 11, 5821 (2021). doi:10.1038/s41598-021-84310-w
+M. T. Wright, &quot;The Antikythera Mechanism and the early history of the moon-phase display&quot;, Antiquarian Horology 29(3), 319–329 (2006).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #archaeology #ancientgreece #antikythera #historyofscience #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Euler" style="--hue:#303F9F">
+  <div class="num">04</div>
+  <div class="body">
+    <h2>Why e^(iπ) + 1 = 0 is true, in one rotating arrow</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Euler.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Why e^(iπ) + 1 = 0 is true, in one rotating arrow.
+
+Sources:
+L. Euler, Introductio in analysin infinitorum (1748), where e^(iθ) = cos θ + i sin θ first appears in this form.
+The identity is that formula at θ = π.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #euler #complexnumbers #eulersidentity #manim #shorts" data-instagram="Why e^(iπ) + 1 = 0 is true, in one rotating arrow.
+
+Sources:
+L. Euler, Introductio in analysin infinitorum (1748), where e^(iθ) = cos θ + i sin θ first appears in this form.
+The identity is that formula at θ = π.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #euler #complexnumbers #eulersidentity #manim #shorts" data-tiktok="Why e^(iπ) + 1 = 0 is true, in one rotating arrow.
+
+Sources:
+L. Euler, Introductio in analysin infinitorum (1748), where e^(iθ) = cos θ + i sin θ first appears in this form.
+The identity is that formula at θ = π.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #euler #complexnumbers #eulersidentity #manim #shorts">Why e^(iπ) + 1 = 0 is true, in one rotating arrow.
+
+Sources:
+L. Euler, Introductio in analysin infinitorum (1748), where e^(iθ) = cos θ + i sin θ first appears in this form.
+The identity is that formula at θ = π.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #euler #complexnumbers #eulersidentity #manim #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Interest" style="--hue:#00796B">
+  <div class="num">05</div>
+  <div class="body">
+    <h2>The rule of 72: doubling your money with one division</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Interest.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The rule of 72: doubling your money with one division.
+
+Sources:
+The exact doubling time of (1+r)^t is ln 2 / ln(1+r); for small r this is close to 69.3/r, and 72 is the convenient divisible rounding.
+L. Pacioli, Summa de arithmetica, geometria, proportioni et proportionalita (1494), the earliest known statement of the rule.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #compoundinterest #ruleof72 #finance #maths #shorts" data-instagram="The rule of 72: doubling your money with one division.
+
+Sources:
+The exact doubling time of (1+r)^t is ln 2 / ln(1+r); for small r this is close to 69.3/r, and 72 is the convenient divisible rounding.
+L. Pacioli, Summa de arithmetica, geometria, proportioni et proportionalita (1494), the earliest known statement of the rule.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #compoundinterest #ruleof72 #finance #maths #shorts" data-tiktok="The rule of 72: doubling your money with one division.
+
+Sources:
+The exact doubling time of (1+r)^t is ln 2 / ln(1+r); for small r this is close to 69.3/r, and 72 is the convenient divisible rounding.
+L. Pacioli, Summa de arithmetica, geometria, proportioni et proportionalita (1494), the earliest known statement of the rule.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #compoundinterest #ruleof72 #finance #maths #shorts">The rule of 72: doubling your money with one division.
+
+Sources:
+The exact doubling time of (1+r)^t is ln 2 / ln(1+r); for small r this is close to 69.3/r, and 72 is the convenient divisible rounding.
+L. Pacioli, Summa de arithmetica, geometria, proportioni et proportionalita (1494), the earliest known statement of the rule.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #compoundinterest #ruleof72 #finance #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Eratosthenes" style="--hue:#D32F2F">
+  <div class="num">06</div>
+  <div class="body">
+    <h2>How a stick and a shadow measured the Earth</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Eratosthenes.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="How a stick and a shadow measured the Earth.
+
+Sources:
+Cleomedes, On the Circular Motions of the Celestial Bodies (1st c. AD), the surviving account of Eratosthenes of Cyrene&#x27;s measurement.
+A 7.2° shadow is 1/50 of a turn; Syene to Alexandria was reckoned at about 5,000 stadia, giving 250,000 stadia for the circumference.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #eratosthenes #astronomy #ancientgreece #geometry #shorts" data-instagram="How a stick and a shadow measured the Earth.
+
+Sources:
+Cleomedes, On the Circular Motions of the Celestial Bodies (1st c. AD), the surviving account of Eratosthenes of Cyrene&#x27;s measurement.
+A 7.2° shadow is 1/50 of a turn; Syene to Alexandria was reckoned at about 5,000 stadia, giving 250,000 stadia for the circumference.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #eratosthenes #astronomy #ancientgreece #geometry #shorts" data-tiktok="How a stick and a shadow measured the Earth.
+
+Sources:
+Cleomedes, On the Circular Motions of the Celestial Bodies (1st c. AD), the surviving account of Eratosthenes of Cyrene&#x27;s measurement.
+A 7.2° shadow is 1/50 of a turn; Syene to Alexandria was reckoned at about 5,000 stadia, giving 250,000 stadia for the circumference.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #eratosthenes #astronomy #ancientgreece #geometry #shorts">How a stick and a shadow measured the Earth.
+
+Sources:
+Cleomedes, On the Circular Motions of the Celestial Bodies (1st c. AD), the surviving account of Eratosthenes of Cyrene&#x27;s measurement.
+A 7.2° shadow is 1/50 of a turn; Syene to Alexandria was reckoned at about 5,000 stadia, giving 250,000 stadia for the circumference.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #eratosthenes #astronomy #ancientgreece #geometry #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Octaves" style="--hue:#E65100">
+  <div class="num">07</div>
+  <div class="body">
+    <h2>Why an octave sounds like the same note</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Octaves.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Why an octave sounds like the same note.
+
+Sources:
+The 2:1 length to pitch relation is attributed to the Pythagoreans (6th c. BC); see the Sectio canonis attributed to Euclid.
+H. von Helmholtz, On the Sensations of Tone as a Physiological Basis for the Theory of Music (1863), for frequency doubling.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #octave #acoustics #physics #shorts" data-instagram="Why an octave sounds like the same note.
+
+Sources:
+The 2:1 length to pitch relation is attributed to the Pythagoreans (6th c. BC); see the Sectio canonis attributed to Euclid.
+H. von Helmholtz, On the Sensations of Tone as a Physiological Basis for the Theory of Music (1863), for frequency doubling.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #octave #acoustics #physics #shorts" data-tiktok="Why an octave sounds like the same note.
+
+Sources:
+The 2:1 length to pitch relation is attributed to the Pythagoreans (6th c. BC); see the Sectio canonis attributed to Euclid.
+H. von Helmholtz, On the Sensations of Tone as a Physiological Basis for the Theory of Music (1863), for frequency doubling.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #octave #acoustics #physics #shorts">Why an octave sounds like the same note.
+
+Sources:
+The 2:1 length to pitch relation is attributed to the Pythagoreans (6th c. BC); see the Sectio canonis attributed to Euclid.
+H. von Helmholtz, On the Sensations of Tone as a Physiological Basis for the Theory of Music (1863), for frequency doubling.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #octave #acoustics #physics #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-MontyHall" style="--hue:#7B1FA2">
+  <div class="num">08</div>
+  <div class="body">
+    <h2>The Monty Hall problem, settled by 10,000 games</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-MontyHall.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The Monty Hall problem, settled by 10,000 games.
+
+Sources:
+S. Selvin, &quot;A problem in probability&quot; (letter), The American Statistician 29(1), 67 (1975).
+Popularised by M. vos Savant in her Parade column (1990).
+The tally in the video is a live simulation of 10,000 games.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #montyhall #statistics #maths #puzzle #shorts" data-instagram="The Monty Hall problem, settled by 10,000 games.
+
+Sources:
+S. Selvin, &quot;A problem in probability&quot; (letter), The American Statistician 29(1), 67 (1975).
+Popularised by M. vos Savant in her Parade column (1990).
+The tally in the video is a live simulation of 10,000 games.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #montyhall #statistics #maths #puzzle #shorts" data-tiktok="The Monty Hall problem, settled by 10,000 games.
+
+Sources:
+S. Selvin, &quot;A problem in probability&quot; (letter), The American Statistician 29(1), 67 (1975).
+Popularised by M. vos Savant in her Parade column (1990).
+The tally in the video is a live simulation of 10,000 games.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #montyhall #statistics #maths #puzzle #shorts">The Monty Hall problem, settled by 10,000 games.
+
+Sources:
+S. Selvin, &quot;A problem in probability&quot; (letter), The American Statistician 29(1), 67 (1975).
+Popularised by M. vos Savant in her Parade column (1990).
+The tally in the video is a live simulation of 10,000 games.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #montyhall #statistics #maths #puzzle #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Prisoner" style="--hue:#2E7D32">
+  <div class="num">09</div>
+  <div class="body">
+    <h2>Why cooperation survives the prisoner&#x27;s dilemma</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Prisoner.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Why cooperation survives the prisoner&#x27;s dilemma.
+
+Sources:
+R. Axelrod, The Evolution of Cooperation, Basic Books (1984). In his computer tournaments the simplest entry, tit-for-tat, won: be nice, retaliate, forgive, be clear.
+The bars in the video are a five-strategy round-robin over 200 rounds.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#gametheory #prisonersdilemma #cooperation #axelrod #economics #shorts" data-instagram="Why cooperation survives the prisoner&#x27;s dilemma.
+
+Sources:
+R. Axelrod, The Evolution of Cooperation, Basic Books (1984). In his computer tournaments the simplest entry, tit-for-tat, won: be nice, retaliate, forgive, be clear.
+The bars in the video are a five-strategy round-robin over 200 rounds.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#gametheory #prisonersdilemma #cooperation #axelrod #economics #shorts" data-tiktok="Why cooperation survives the prisoner&#x27;s dilemma.
+
+Sources:
+R. Axelrod, The Evolution of Cooperation, Basic Books (1984). In his computer tournaments the simplest entry, tit-for-tat, won: be nice, retaliate, forgive, be clear.
+The bars in the video are a five-strategy round-robin over 200 rounds.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#gametheory #prisonersdilemma #cooperation #axelrod #economics #shorts">Why cooperation survives the prisoner&#x27;s dilemma.
+
+Sources:
+R. Axelrod, The Evolution of Cooperation, Basic Books (1984). In his computer tournaments the simplest entry, tit-for-tat, won: be nice, retaliate, forgive, be clear.
+The bars in the video are a five-strategy round-robin over 200 rounds.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#gametheory #prisonersdilemma #cooperation #axelrod #economics #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Zeno" style="--hue:#BF360C">
+  <div class="num">10</div>
+  <div class="body">
+    <h2>Achilles, the tortoise, and an infinite sum that ends</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Zeno.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Achilles, the tortoise, and an infinite sum that ends.
+
+Sources:
+Zeno&#x27;s paradoxes, as reported in Aristotle, Physics VI:9, 239b.
+The convergent geometric series 1/2 + 1/4 + 1/8 + … = 1 resolves the paradox; the modern treatment of convergence is Cauchy&#x27;s (1821).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #zeno #paradox #infinity #maths #shorts" data-instagram="Achilles, the tortoise, and an infinite sum that ends.
+
+Sources:
+Zeno&#x27;s paradoxes, as reported in Aristotle, Physics VI:9, 239b.
+The convergent geometric series 1/2 + 1/4 + 1/8 + … = 1 resolves the paradox; the modern treatment of convergence is Cauchy&#x27;s (1821).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #zeno #paradox #infinity #maths #shorts" data-tiktok="Achilles, the tortoise, and an infinite sum that ends.
+
+Sources:
+Zeno&#x27;s paradoxes, as reported in Aristotle, Physics VI:9, 239b.
+The convergent geometric series 1/2 + 1/4 + 1/8 + … = 1 resolves the paradox; the modern treatment of convergence is Cauchy&#x27;s (1821).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #zeno #paradox #infinity #maths #shorts">Achilles, the tortoise, and an infinite sum that ends.
+
+Sources:
+Zeno&#x27;s paradoxes, as reported in Aristotle, Physics VI:9, 239b.
+The convergent geometric series 1/2 + 1/4 + 1/8 + … = 1 resolves the paradox; the modern treatment of convergence is Cauchy&#x27;s (1821).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #zeno #paradox #infinity #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Fifths" style="--hue:#0277BD">
+  <div class="num">11</div>
+  <div class="body">
+    <h2>The circle of fifths doesn&#x27;t quite close</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Fifths.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The circle of fifths doesn&#x27;t quite close.
+
+Sources:
+Pythagorean tuning stacks pure 3:2 fifths. Twelve of them overshoot seven octaves by the Pythagorean comma, (3/2)^12 / 2^7 ≈ 1.0136.
+Equal temperament spreads that error evenly across the twelve semitones, which is why no interval but the octave is pure.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #circleoffifths #tuning #maths #shorts" data-instagram="The circle of fifths doesn&#x27;t quite close.
+
+Sources:
+Pythagorean tuning stacks pure 3:2 fifths. Twelve of them overshoot seven octaves by the Pythagorean comma, (3/2)^12 / 2^7 ≈ 1.0136.
+Equal temperament spreads that error evenly across the twelve semitones, which is why no interval but the octave is pure.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #circleoffifths #tuning #maths #shorts" data-tiktok="The circle of fifths doesn&#x27;t quite close.
+
+Sources:
+Pythagorean tuning stacks pure 3:2 fifths. Twelve of them overshoot seven octaves by the Pythagorean comma, (3/2)^12 / 2^7 ≈ 1.0136.
+Equal temperament spreads that error evenly across the twelve semitones, which is why no interval but the octave is pure.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #circleoffifths #tuning #maths #shorts">The circle of fifths doesn&#x27;t quite close.
+
+Sources:
+Pythagorean tuning stacks pure 3:2 fifths. Twelve of them overshoot seven octaves by the Pythagorean comma, (3/2)^12 / 2^7 ≈ 1.0136.
+Equal temperament spreads that error evenly across the twelve semitones, which is why no interval but the octave is pure.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #musictheory #circleoffifths #tuning #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Buffon" style="--hue:#5D4037">
+  <div class="num">12</div>
+  <div class="body">
+    <h2>Estimating π by dropping needles on a floor</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Buffon.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Estimating π by dropping needles on a floor.
+
+Sources:
+G.-L. Leclerc, Comte de Buffon, Essai d&#x27;arithmétique morale (1777).
+When the needle length equals the line spacing, a crossing has probability 2/π.
+The run in the video is 180 needles, 114 crossings.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #pi #buffonsneedle #montecarlo #maths #shorts" data-instagram="Estimating π by dropping needles on a floor.
+
+Sources:
+G.-L. Leclerc, Comte de Buffon, Essai d&#x27;arithmétique morale (1777).
+When the needle length equals the line spacing, a crossing has probability 2/π.
+The run in the video is 180 needles, 114 crossings.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #pi #buffonsneedle #montecarlo #maths #shorts" data-tiktok="Estimating π by dropping needles on a floor.
+
+Sources:
+G.-L. Leclerc, Comte de Buffon, Essai d&#x27;arithmétique morale (1777).
+When the needle length equals the line spacing, a crossing has probability 2/π.
+The run in the video is 180 needles, 114 crossings.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #pi #buffonsneedle #montecarlo #maths #shorts">Estimating π by dropping needles on a floor.
+
+Sources:
+G.-L. Leclerc, Comte de Buffon, Essai d&#x27;arithmétique morale (1777).
+When the needle length equals the line spacing, a crossing has probability 2/π.
+The run in the video is 180 needles, 114 crossings.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#probability #pi #buffonsneedle #montecarlo #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Simpson" style="--hue:#00838F">
+  <div class="num">13</div>
+  <div class="body">
+    <h2>Simpson&#x27;s paradox: when every group disagrees with the total</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Simpson.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Simpson&#x27;s paradox: when every group disagrees with the total.
+
+Sources:
+P. J. Bickel, E. A. Hammel &amp; J. W. O&#x27;Connell, &quot;Sex Bias in Graduate Admissions: Data from Berkeley&quot;, Science 187, 398–404 (1975). doi:10.1126/science.187.4175.398
+E. H. Simpson, &quot;The Interpretation of Interaction in Contingency Tables&quot;, Journal of the Royal Statistical Society B 13, 238–241 (1951).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #simpsonsparadox #data #berkeley #maths #shorts" data-instagram="Simpson&#x27;s paradox: when every group disagrees with the total.
+
+Sources:
+P. J. Bickel, E. A. Hammel &amp; J. W. O&#x27;Connell, &quot;Sex Bias in Graduate Admissions: Data from Berkeley&quot;, Science 187, 398–404 (1975). doi:10.1126/science.187.4175.398
+E. H. Simpson, &quot;The Interpretation of Interaction in Contingency Tables&quot;, Journal of the Royal Statistical Society B 13, 238–241 (1951).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #simpsonsparadox #data #berkeley #maths #shorts" data-tiktok="Simpson&#x27;s paradox: when every group disagrees with the total.
+
+Sources:
+P. J. Bickel, E. A. Hammel &amp; J. W. O&#x27;Connell, &quot;Sex Bias in Graduate Admissions: Data from Berkeley&quot;, Science 187, 398–404 (1975). doi:10.1126/science.187.4175.398
+E. H. Simpson, &quot;The Interpretation of Interaction in Contingency Tables&quot;, Journal of the Royal Statistical Society B 13, 238–241 (1951).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #simpsonsparadox #data #berkeley #maths #shorts">Simpson&#x27;s paradox: when every group disagrees with the total.
+
+Sources:
+P. J. Bickel, E. A. Hammel &amp; J. W. O&#x27;Connell, &quot;Sex Bias in Graduate Admissions: Data from Berkeley&quot;, Science 187, 398–404 (1975). doi:10.1126/science.187.4175.398
+E. H. Simpson, &quot;The Interpretation of Interaction in Contingency Tables&quot;, Journal of the Royal Statistical Society B 13, 238–241 (1951).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #simpsonsparadox #data #berkeley #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Rosetta" style="--hue:#AD1457">
+  <div class="num">14</div>
+  <div class="body">
+    <h2>How one ringed name cracked the Rosetta Stone</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Rosetta.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="How one ringed name cracked the Rosetta Stone.
+
+Sources:
+J.-F. Champollion, Lettre à M. Dacier relative à l&#x27;alphabet des hiéroglyphes phonétiques (1822).
+Matching the cartouches of Ptolemy and Cleopatra across the three scripts fixed the phonetic values of the hieroglyphs.
+The signs drawn in the video are schematic stand-ins, not tracings of the stone.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #linguistics #rosettastone #hieroglyphs #egypt #shorts" data-instagram="How one ringed name cracked the Rosetta Stone.
+
+Sources:
+J.-F. Champollion, Lettre à M. Dacier relative à l&#x27;alphabet des hiéroglyphes phonétiques (1822).
+Matching the cartouches of Ptolemy and Cleopatra across the three scripts fixed the phonetic values of the hieroglyphs.
+The signs drawn in the video are schematic stand-ins, not tracings of the stone.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #linguistics #rosettastone #hieroglyphs #egypt #shorts" data-tiktok="How one ringed name cracked the Rosetta Stone.
+
+Sources:
+J.-F. Champollion, Lettre à M. Dacier relative à l&#x27;alphabet des hiéroglyphes phonétiques (1822).
+Matching the cartouches of Ptolemy and Cleopatra across the three scripts fixed the phonetic values of the hieroglyphs.
+The signs drawn in the video are schematic stand-ins, not tracings of the stone.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #linguistics #rosettastone #hieroglyphs #egypt #shorts">How one ringed name cracked the Rosetta Stone.
+
+Sources:
+J.-F. Champollion, Lettre à M. Dacier relative à l&#x27;alphabet des hiéroglyphes phonétiques (1822).
+Matching the cartouches of Ptolemy and Cleopatra across the three scripts fixed the phonetic values of the hieroglyphs.
+The signs drawn in the video are schematic stand-ins, not tracings of the stone.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #linguistics #rosettastone #hieroglyphs #egypt #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Golden" style="--hue:#558B2F">
+  <div class="num">15</div>
+  <div class="body">
+    <h2>The one angle every plant grows by: 137.5°</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Golden.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The one angle every plant grows by: 137.5°.
+
+Sources:
+H. Vogel, &quot;A better way to construct the sunflower head&quot;, Mathematical Biosciences 44, 179–189 (1979). doi:10.1016/0025-5564(79)90080-4
+Seed k sits at angle k × 137.5° with radius proportional to √k; 137.5° = 360°/φ², φ = (1+√5)/2.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #goldenratio #phyllotaxis #nature #botany #shorts" data-instagram="The one angle every plant grows by: 137.5°.
+
+Sources:
+H. Vogel, &quot;A better way to construct the sunflower head&quot;, Mathematical Biosciences 44, 179–189 (1979). doi:10.1016/0025-5564(79)90080-4
+Seed k sits at angle k × 137.5° with radius proportional to √k; 137.5° = 360°/φ², φ = (1+√5)/2.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #goldenratio #phyllotaxis #nature #botany #shorts" data-tiktok="The one angle every plant grows by: 137.5°.
+
+Sources:
+H. Vogel, &quot;A better way to construct the sunflower head&quot;, Mathematical Biosciences 44, 179–189 (1979). doi:10.1016/0025-5564(79)90080-4
+Seed k sits at angle k × 137.5° with radius proportional to √k; 137.5° = 360°/φ², φ = (1+√5)/2.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #goldenratio #phyllotaxis #nature #botany #shorts">The one angle every plant grows by: 137.5°.
+
+Sources:
+H. Vogel, &quot;A better way to construct the sunflower head&quot;, Mathematical Biosciences 44, 179–189 (1979). doi:10.1016/0025-5564(79)90080-4
+Seed k sits at angle k × 137.5° with radius proportional to √k; 137.5° = 360°/φ², φ = (1+√5)/2.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #goldenratio #phyllotaxis #nature #botany #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Fourier" style="--hue:#512DA8">
+  <div class="num">16</div>
+  <div class="body">
+    <h2>Building a square wave out of sine waves</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Fourier.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Building a square wave out of sine waves.
+
+Sources:
+J. Fourier, Théorie analytique de la chaleur (1822).
+The square wave is the sum over odd k of sin(kx)/k.
+The 9% overshoot that will not go away at the jumps is the Gibbs phenomenon: J. W. Gibbs, Nature 59, 606 (1899).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #fourier #fourierseries #waves #signals #shorts" data-instagram="Building a square wave out of sine waves.
+
+Sources:
+J. Fourier, Théorie analytique de la chaleur (1822).
+The square wave is the sum over odd k of sin(kx)/k.
+The 9% overshoot that will not go away at the jumps is the Gibbs phenomenon: J. W. Gibbs, Nature 59, 606 (1899).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #fourier #fourierseries #waves #signals #shorts" data-tiktok="Building a square wave out of sine waves.
+
+Sources:
+J. Fourier, Théorie analytique de la chaleur (1822).
+The square wave is the sum over odd k of sin(kx)/k.
+The 9% overshoot that will not go away at the jumps is the Gibbs phenomenon: J. W. Gibbs, Nature 59, 606 (1899).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #fourier #fourierseries #waves #signals #shorts">Building a square wave out of sine waves.
+
+Sources:
+J. Fourier, Théorie analytique de la chaleur (1822).
+The square wave is the sum over odd k of sin(kx)/k.
+The 9% overshoot that will not go away at the jumps is the Gibbs phenomenon: J. W. Gibbs, Nature 59, 606 (1899).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #fourier #fourierseries #waves #signals #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Commons" style="--hue:#1565C0">
+  <div class="num">17</div>
+  <div class="body">
+    <h2>The tragedy of the commons, in one grazing field</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Commons.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The tragedy of the commons, in one grazing field.
+
+Sources:
+G. Hardin, &quot;The Tragedy of the Commons&quot;, Science 162, 1243–1248 (1968). doi:10.1126/science.162.3859.1243
+Foreshadowed by W. F. Lloyd, Two Lectures on the Checks to Population (1833).
+E. Ostrom, Governing the Commons, Cambridge University Press (1990), on the ways communities actually avoid it.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #tragedyofthecommons #gametheory #sustainability #ostrom #shorts" data-instagram="The tragedy of the commons, in one grazing field.
+
+Sources:
+G. Hardin, &quot;The Tragedy of the Commons&quot;, Science 162, 1243–1248 (1968). doi:10.1126/science.162.3859.1243
+Foreshadowed by W. F. Lloyd, Two Lectures on the Checks to Population (1833).
+E. Ostrom, Governing the Commons, Cambridge University Press (1990), on the ways communities actually avoid it.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #tragedyofthecommons #gametheory #sustainability #ostrom #shorts" data-tiktok="The tragedy of the commons, in one grazing field.
+
+Sources:
+G. Hardin, &quot;The Tragedy of the Commons&quot;, Science 162, 1243–1248 (1968). doi:10.1126/science.162.3859.1243
+Foreshadowed by W. F. Lloyd, Two Lectures on the Checks to Population (1833).
+E. Ostrom, Governing the Commons, Cambridge University Press (1990), on the ways communities actually avoid it.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #tragedyofthecommons #gametheory #sustainability #ostrom #shorts">The tragedy of the commons, in one grazing field.
+
+Sources:
+G. Hardin, &quot;The Tragedy of the Commons&quot;, Science 162, 1243–1248 (1968). doi:10.1126/science.162.3859.1243
+Foreshadowed by W. F. Lloyd, Two Lectures on the Checks to Population (1833).
+E. Ostrom, Governing the Commons, Cambridge University Press (1990), on the ways communities actually avoid it.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #tragedyofthecommons #gametheory #sustainability #ostrom #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Gutenberg" style="--hue:#455A64">
+  <div class="num">18</div>
+  <div class="body">
+    <h2>What the printing press did to human knowledge</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Gutenberg.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="What the printing press did to human knowledge.
+
+Sources:
+E. Buringh &amp; J. L. van Zanden, &quot;Charting the Rise of the West: Manuscripts and Printed Books in Europe&quot;, Journal of Economic History 69(2), 409–445 (2009). doi:10.1017/S0022050709000837
+Printed-book totals after 1450 are standard order-of-magnitude estimates, not exact counts.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #gutenberg #printingpress #books #renaissance #shorts" data-instagram="What the printing press did to human knowledge.
+
+Sources:
+E. Buringh &amp; J. L. van Zanden, &quot;Charting the Rise of the West: Manuscripts and Printed Books in Europe&quot;, Journal of Economic History 69(2), 409–445 (2009). doi:10.1017/S0022050709000837
+Printed-book totals after 1450 are standard order-of-magnitude estimates, not exact counts.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #gutenberg #printingpress #books #renaissance #shorts" data-tiktok="What the printing press did to human knowledge.
+
+Sources:
+E. Buringh &amp; J. L. van Zanden, &quot;Charting the Rise of the West: Manuscripts and Printed Books in Europe&quot;, Journal of Economic History 69(2), 409–445 (2009). doi:10.1017/S0022050709000837
+Printed-book totals after 1450 are standard order-of-magnitude estimates, not exact counts.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #gutenberg #printingpress #books #renaissance #shorts">What the printing press did to human knowledge.
+
+Sources:
+E. Buringh &amp; J. L. van Zanden, &quot;Charting the Rise of the West: Manuscripts and Printed Books in Europe&quot;, Journal of Economic History 69(2), 409–445 (2009). doi:10.1017/S0022050709000837
+Printed-book totals after 1450 are standard order-of-magnitude estimates, not exact counts.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#history #gutenberg #printingpress #books #renaissance #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Tessellation" style="--hue:#673AB7">
+  <div class="num">19</div>
+  <div class="body">
+    <h2>Escher&#x27;s trick: how one tile fills a wall</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Tessellation.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Escher&#x27;s trick: how one tile fills a wall.
+
+Sources:
+The cut-and-slide method underlies M. C. Escher&#x27;s periodic drawings from 1936 onwards.
+Every periodic plane tiling belongs to one of the 17 wallpaper groups, classified by E. S. Fedorov (1891).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #escher #tessellation #geometry #symmetry #shorts" data-instagram="Escher&#x27;s trick: how one tile fills a wall.
+
+Sources:
+The cut-and-slide method underlies M. C. Escher&#x27;s periodic drawings from 1936 onwards.
+Every periodic plane tiling belongs to one of the 17 wallpaper groups, classified by E. S. Fedorov (1891).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #escher #tessellation #geometry #symmetry #shorts" data-tiktok="Escher&#x27;s trick: how one tile fills a wall.
+
+Sources:
+The cut-and-slide method underlies M. C. Escher&#x27;s periodic drawings from 1936 onwards.
+Every periodic plane tiling belongs to one of the 17 wallpaper groups, classified by E. S. Fedorov (1891).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #escher #tessellation #geometry #symmetry #shorts">Escher&#x27;s trick: how one tile fills a wall.
+
+Sources:
+The cut-and-slide method underlies M. C. Escher&#x27;s periodic drawings from 1936 onwards.
+Every periodic plane tiling belongs to one of the 17 wallpaper groups, classified by E. S. Fedorov (1891).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #escher #tessellation #geometry #symmetry #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Kepler" style="--hue:#303F9F">
+  <div class="num">20</div>
+  <div class="body">
+    <h2>Kepler&#x27;s second law: equal areas in equal times</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Kepler.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Kepler&#x27;s second law: equal areas in equal times.
+
+Sources:
+J. Kepler, Astronomia nova (1609), the second law.
+The radius vector from the Sun sweeps equal areas in equal times, which is angular momentum conservation before anyone called it that.
+The wedge areas in the video are computed with the shoelace formula on the same orbit that drives the animation.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #kepler #orbits #astronomy #space #shorts" data-instagram="Kepler&#x27;s second law: equal areas in equal times.
+
+Sources:
+J. Kepler, Astronomia nova (1609), the second law.
+The radius vector from the Sun sweeps equal areas in equal times, which is angular momentum conservation before anyone called it that.
+The wedge areas in the video are computed with the shoelace formula on the same orbit that drives the animation.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #kepler #orbits #astronomy #space #shorts" data-tiktok="Kepler&#x27;s second law: equal areas in equal times.
+
+Sources:
+J. Kepler, Astronomia nova (1609), the second law.
+The radius vector from the Sun sweeps equal areas in equal times, which is angular momentum conservation before anyone called it that.
+The wedge areas in the video are computed with the shoelace formula on the same orbit that drives the animation.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #kepler #orbits #astronomy #space #shorts">Kepler&#x27;s second law: equal areas in equal times.
+
+Sources:
+J. Kepler, Astronomia nova (1609), the second law.
+The radius vector from the Sun sweeps equal areas in equal times, which is angular momentum conservation before anyone called it that.
+The wedge areas in the video are computed with the shoelace formula on the same orbit that drives the animation.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #kepler #orbits #astronomy #space #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Zipf" style="--hue:#00796B">
+  <div class="num">21</div>
+  <div class="body">
+    <h2>Zipf&#x27;s law: the 1/rank pattern hiding in every language</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Zipf.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Zipf&#x27;s law: the 1/rank pattern hiding in every language.
+
+Sources:
+G. K. Zipf, Human Behavior and the Principle of Least Effort, Addison-Wesley (1949).
+Word frequency falls off as roughly 1/rank, which is a straight line on log-log axes.
+Counts shown are from standard English corpora.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#linguistics #zipfslaw #language #statistics #powerlaw #shorts" data-instagram="Zipf&#x27;s law: the 1/rank pattern hiding in every language.
+
+Sources:
+G. K. Zipf, Human Behavior and the Principle of Least Effort, Addison-Wesley (1949).
+Word frequency falls off as roughly 1/rank, which is a straight line on log-log axes.
+Counts shown are from standard English corpora.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#linguistics #zipfslaw #language #statistics #powerlaw #shorts" data-tiktok="Zipf&#x27;s law: the 1/rank pattern hiding in every language.
+
+Sources:
+G. K. Zipf, Human Behavior and the Principle of Least Effort, Addison-Wesley (1949).
+Word frequency falls off as roughly 1/rank, which is a straight line on log-log axes.
+Counts shown are from standard English corpora.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#linguistics #zipfslaw #language #statistics #powerlaw #shorts">Zipf&#x27;s law: the 1/rank pattern hiding in every language.
+
+Sources:
+G. K. Zipf, Human Behavior and the Principle of Least Effort, Addison-Wesley (1949).
+Word frequency falls off as roughly 1/rank, which is a straight line on log-log axes.
+Counts shown are from standard English corpora.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#linguistics #zipfslaw #language #statistics #powerlaw #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Theseus" style="--hue:#D32F2F">
+  <div class="num">22</div>
+  <div class="body">
+    <h2>The Ship of Theseus: every plank replaced</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Theseus.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The Ship of Theseus: every plank replaced.
+
+Sources:
+Plutarch, Life of Theseus, 23.1.
+The two-ships twist, where the discarded planks are reassembled, is due to Thomas Hobbes, De Corpore (1655).
+It is a puzzle about identity, not about carpentry.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #shipoftheseus #identity #metaphysics #plutarch #shorts" data-instagram="The Ship of Theseus: every plank replaced.
+
+Sources:
+Plutarch, Life of Theseus, 23.1.
+The two-ships twist, where the discarded planks are reassembled, is due to Thomas Hobbes, De Corpore (1655).
+It is a puzzle about identity, not about carpentry.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #shipoftheseus #identity #metaphysics #plutarch #shorts" data-tiktok="The Ship of Theseus: every plank replaced.
+
+Sources:
+Plutarch, Life of Theseus, 23.1.
+The two-ships twist, where the discarded planks are reassembled, is due to Thomas Hobbes, De Corpore (1655).
+It is a puzzle about identity, not about carpentry.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #shipoftheseus #identity #metaphysics #plutarch #shorts">The Ship of Theseus: every plank replaced.
+
+Sources:
+Plutarch, Life of Theseus, 23.1.
+The two-ships twist, where the discarded planks are reassembled, is due to Thomas Hobbes, De Corpore (1655).
+It is a puzzle about identity, not about carpentry.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #shipoftheseus #identity #metaphysics #plutarch #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Polyrhythm" style="--hue:#E65100">
+  <div class="num">23</div>
+  <div class="body">
+    <h2>Three against four: the simplest polyrhythm</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Polyrhythm.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Three against four: the simplest polyrhythm.
+
+Sources:
+A 3:4 polyrhythm divides the bar into lcm(3,4) = 12 equal parts, so the two pulses coincide once per bar.
+The same figure is the hemiola of Romantic concert music and a staple of West African drumming.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #polyrhythm #rhythm #drums #musictheory #shorts" data-instagram="Three against four: the simplest polyrhythm.
+
+Sources:
+A 3:4 polyrhythm divides the bar into lcm(3,4) = 12 equal parts, so the two pulses coincide once per bar.
+The same figure is the hemiola of Romantic concert music and a staple of West African drumming.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #polyrhythm #rhythm #drums #musictheory #shorts" data-tiktok="Three against four: the simplest polyrhythm.
+
+Sources:
+A 3:4 polyrhythm divides the bar into lcm(3,4) = 12 equal parts, so the two pulses coincide once per bar.
+The same figure is the hemiola of Romantic concert music and a staple of West African drumming.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #polyrhythm #rhythm #drums #musictheory #shorts">Three against four: the simplest polyrhythm.
+
+Sources:
+A 3:4 polyrhythm divides the bar into lcm(3,4) = 12 equal parts, so the two pulses coincide once per bar.
+The same figure is the hemiola of Romantic concert music and a staple of West African drumming.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#music #polyrhythm #rhythm #drums #musictheory #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Benford" style="--hue:#7B1FA2">
+  <div class="num">24</div>
+  <div class="body">
+    <h2>Why the digit 1 leads more often than 9</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Benford.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Why the digit 1 leads more often than 9.
+
+Sources:
+S. Newcomb, &quot;Note on the Frequency of Use of the Different Digits in Natural Numbers&quot;, American Journal of Mathematics 4, 39–40 (1881).
+F. Benford, &quot;The Law of Anomalous Numbers&quot;, Proceedings of the American Philosophical Society 78, 551–572 (1938).
+P(d) = log10(1 + 1/d). Powers of two obey it because log10 2 is irrational, so their fractional parts are equidistributed.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #benfordslaw #data #fraud #maths #shorts" data-instagram="Why the digit 1 leads more often than 9.
+
+Sources:
+S. Newcomb, &quot;Note on the Frequency of Use of the Different Digits in Natural Numbers&quot;, American Journal of Mathematics 4, 39–40 (1881).
+F. Benford, &quot;The Law of Anomalous Numbers&quot;, Proceedings of the American Philosophical Society 78, 551–572 (1938).
+P(d) = log10(1 + 1/d). Powers of two obey it because log10 2 is irrational, so their fractional parts are equidistributed.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #benfordslaw #data #fraud #maths #shorts" data-tiktok="Why the digit 1 leads more often than 9.
+
+Sources:
+S. Newcomb, &quot;Note on the Frequency of Use of the Different Digits in Natural Numbers&quot;, American Journal of Mathematics 4, 39–40 (1881).
+F. Benford, &quot;The Law of Anomalous Numbers&quot;, Proceedings of the American Philosophical Society 78, 551–572 (1938).
+P(d) = log10(1 + 1/d). Powers of two obey it because log10 2 is irrational, so their fractional parts are equidistributed.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #benfordslaw #data #fraud #maths #shorts">Why the digit 1 leads more often than 9.
+
+Sources:
+S. Newcomb, &quot;Note on the Frequency of Use of the Different Digits in Natural Numbers&quot;, American Journal of Mathematics 4, 39–40 (1881).
+F. Benford, &quot;The Law of Anomalous Numbers&quot;, Proceedings of the American Philosophical Society 78, 551–572 (1938).
+P(d) = log10(1 + 1/d). Powers of two obey it because log10 2 is irrational, so their fractional parts are equidistributed.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#statistics #benfordslaw #data #fraud #maths #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Gini" style="--hue:#2E7D32">
+  <div class="num">25</div>
+  <div class="body">
+    <h2>The Gini coefficient: inequality as one number</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Gini.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The Gini coefficient: inequality as one number.
+
+Sources:
+C. Gini, Variabilità e mutabilità (1912).
+M. O. Lorenz, &quot;Methods of Measuring the Concentration of Wealth&quot;, Publications of the American Statistical Association 9, 209–219 (1905).
+Gini = 1 − 2∫L(x)dx over [0,1]. The curve in the video comes from a log-normal income sample of 4,000.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #inequality #gini #lorenzcurve #statistics #shorts" data-instagram="The Gini coefficient: inequality as one number.
+
+Sources:
+C. Gini, Variabilità e mutabilità (1912).
+M. O. Lorenz, &quot;Methods of Measuring the Concentration of Wealth&quot;, Publications of the American Statistical Association 9, 209–219 (1905).
+Gini = 1 − 2∫L(x)dx over [0,1]. The curve in the video comes from a log-normal income sample of 4,000.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #inequality #gini #lorenzcurve #statistics #shorts" data-tiktok="The Gini coefficient: inequality as one number.
+
+Sources:
+C. Gini, Variabilità e mutabilità (1912).
+M. O. Lorenz, &quot;Methods of Measuring the Concentration of Wealth&quot;, Publications of the American Statistical Association 9, 209–219 (1905).
+Gini = 1 − 2∫L(x)dx over [0,1]. The curve in the video comes from a log-normal income sample of 4,000.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #inequality #gini #lorenzcurve #statistics #shorts">The Gini coefficient: inequality as one number.
+
+Sources:
+C. Gini, Variabilità e mutabilità (1912).
+M. O. Lorenz, &quot;Methods of Measuring the Concentration of Wealth&quot;, Publications of the American Statistical Association 9, 209–219 (1905).
+Gini = 1 − 2∫L(x)dx over [0,1]. The curve in the video comes from a log-normal income sample of 4,000.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#economics #inequality #gini #lorenzcurve #statistics #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Trolley" style="--hue:#BF360C">
+  <div class="num">26</div>
+  <div class="body">
+    <h2>The trolley problem: the count ethics can&#x27;t settle</h2>
+    <p class="field">Humanities</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Trolley.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The trolley problem: the count ethics can&#x27;t settle.
+
+Sources:
+P. Foot, &quot;The Problem of Abortion and the Doctrine of Double Effect&quot;, Oxford Review 5 (1967).
+J. J. Thomson, &quot;Killing, Letting Die, and the Trolley Problem&quot;, The Monist 59(2), 204–217 (1976).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #ethics #trolleyproblem #morality #thoughtexperiment #shorts" data-instagram="The trolley problem: the count ethics can&#x27;t settle.
+
+Sources:
+P. Foot, &quot;The Problem of Abortion and the Doctrine of Double Effect&quot;, Oxford Review 5 (1967).
+J. J. Thomson, &quot;Killing, Letting Die, and the Trolley Problem&quot;, The Monist 59(2), 204–217 (1976).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #ethics #trolleyproblem #morality #thoughtexperiment #shorts" data-tiktok="The trolley problem: the count ethics can&#x27;t settle.
+
+Sources:
+P. Foot, &quot;The Problem of Abortion and the Doctrine of Double Effect&quot;, Oxford Review 5 (1967).
+J. J. Thomson, &quot;Killing, Letting Die, and the Trolley Problem&quot;, The Monist 59(2), 204–217 (1976).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #ethics #trolleyproblem #morality #thoughtexperiment #shorts">The trolley problem: the count ethics can&#x27;t settle.
+
+Sources:
+P. Foot, &quot;The Problem of Abortion and the Doctrine of Double Effect&quot;, Oxford Review 5 (1967).
+J. J. Thomson, &quot;Killing, Letting Die, and the Trolley Problem&quot;, The Monist 59(2), 204–217 (1976).
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#philosophy #ethics #trolleyproblem #morality #thoughtexperiment #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Perspective" style="--hue:#0277BD">
+  <div class="num">27</div>
+  <div class="body">
+    <h2>The vanishing point: how flat paint became depth</h2>
+    <p class="field">Arts</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Perspective.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The vanishing point: how flat paint became depth.
+
+Sources:
+L. B. Alberti, De pictura (1435), which sets out the costruzione legittima.
+Demonstrated by F. Brunelleschi in his lost panel of the Florence Baptistery, c. 1415.
+The screen height of a floor line falls off as 1/depth, which is the whole construction.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #perspective #renaissance #drawing #geometry #shorts" data-instagram="The vanishing point: how flat paint became depth.
+
+Sources:
+L. B. Alberti, De pictura (1435), which sets out the costruzione legittima.
+Demonstrated by F. Brunelleschi in his lost panel of the Florence Baptistery, c. 1415.
+The screen height of a floor line falls off as 1/depth, which is the whole construction.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #perspective #renaissance #drawing #geometry #shorts" data-tiktok="The vanishing point: how flat paint became depth.
+
+Sources:
+L. B. Alberti, De pictura (1435), which sets out the costruzione legittima.
+Demonstrated by F. Brunelleschi in his lost panel of the Florence Baptistery, c. 1415.
+The screen height of a floor line falls off as 1/depth, which is the whole construction.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #perspective #renaissance #drawing #geometry #shorts">The vanishing point: how flat paint became depth.
+
+Sources:
+L. B. Alberti, De pictura (1435), which sets out the costruzione legittima.
+Demonstrated by F. Brunelleschi in his lost panel of the Florence Baptistery, c. 1415.
+The screen height of a floor line falls off as 1/depth, which is the whole construction.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#art #perspective #renaissance #drawing #geometry #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Pendulum" style="--hue:#5D4037">
+  <div class="num">28</div>
+  <div class="body">
+    <h2>Two double pendulums, 0.01 radians apart</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Pendulum.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Two double pendulums, 0.01 radians apart.
+
+Sources:
+E. N. Lorenz, &quot;Deterministic Nonperiodic Flow&quot;, Journal of the Atmospheric Sciences 20, 130–141 (1963), on sensitive dependence on initial conditions.
+Both trajectories in the video are RK4 integrations of the double pendulum equations, started 0.01 rad apart in θ₁.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #chaos #doublependulum #chaostheory #simulation #shorts" data-instagram="Two double pendulums, 0.01 radians apart.
+
+Sources:
+E. N. Lorenz, &quot;Deterministic Nonperiodic Flow&quot;, Journal of the Atmospheric Sciences 20, 130–141 (1963), on sensitive dependence on initial conditions.
+Both trajectories in the video are RK4 integrations of the double pendulum equations, started 0.01 rad apart in θ₁.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #chaos #doublependulum #chaostheory #simulation #shorts" data-tiktok="Two double pendulums, 0.01 radians apart.
+
+Sources:
+E. N. Lorenz, &quot;Deterministic Nonperiodic Flow&quot;, Journal of the Atmospheric Sciences 20, 130–141 (1963), on sensitive dependence on initial conditions.
+Both trajectories in the video are RK4 integrations of the double pendulum equations, started 0.01 rad apart in θ₁.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #chaos #doublependulum #chaostheory #simulation #shorts">Two double pendulums, 0.01 radians apart.
+
+Sources:
+E. N. Lorenz, &quot;Deterministic Nonperiodic Flow&quot;, Journal of the Atmospheric Sciences 20, 130–141 (1963), on sensitive dependence on initial conditions.
+Both trajectories in the video are RK4 integrations of the double pendulum equations, started 0.01 rad apart in θ₁.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#physics #chaos #doublependulum #chaostheory #simulation #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Schelling" style="--hue:#00838F">
+  <div class="num">29</div>
+  <div class="body">
+    <h2>How mild preference produces total segregation</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Schelling.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="How mild preference produces total segregation.
+
+Sources:
+T. C. Schelling, &quot;Dynamic Models of Segregation&quot;, Journal of Mathematical Sociology 1, 143–186 (1971). doi:10.1080/0022250X.1971.9989794
+The grid in the video is a live simulation with a one-third like-neighbour threshold; the readout is the averaged share of like neighbours.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#sociology #schelling #segregation #emergence #simulation #shorts" data-instagram="How mild preference produces total segregation.
+
+Sources:
+T. C. Schelling, &quot;Dynamic Models of Segregation&quot;, Journal of Mathematical Sociology 1, 143–186 (1971). doi:10.1080/0022250X.1971.9989794
+The grid in the video is a live simulation with a one-third like-neighbour threshold; the readout is the averaged share of like neighbours.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#sociology #schelling #segregation #emergence #simulation #shorts" data-tiktok="How mild preference produces total segregation.
+
+Sources:
+T. C. Schelling, &quot;Dynamic Models of Segregation&quot;, Journal of Mathematical Sociology 1, 143–186 (1971). doi:10.1080/0022250X.1971.9989794
+The grid in the video is a live simulation with a one-third like-neighbour threshold; the readout is the averaged share of like neighbours.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#sociology #schelling #segregation #emergence #simulation #shorts">How mild preference produces total segregation.
+
+Sources:
+T. C. Schelling, &quot;Dynamic Models of Segregation&quot;, Journal of Mathematical Sociology 1, 143–186 (1971). doi:10.1080/0022250X.1971.9989794
+The grid in the video is a live simulation with a one-third like-neighbour threshold; the readout is the averaged share of like neighbours.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#sociology #schelling #segregation #emergence #simulation #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Mandelbrot" style="--hue:#AD1457">
+  <div class="num">30</div>
+  <div class="body">
+    <h2>The edge of the Mandelbrot set never smooths out</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Mandelbrot.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="The edge of the Mandelbrot set never smooths out.
+
+Sources:
+B. B. Mandelbrot, The Fractal Geometry of Nature, W. H. Freeman (1982).
+The set&#x27;s structure was established by A. Douady &amp; J. H. Hubbard, Étude dynamique des polynômes complexes (1984–1985).
+Frames are escape-time iterations of z ↦ z² + c.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #mandelbrot #fractals #complexnumbers #chaos #shorts" data-instagram="The edge of the Mandelbrot set never smooths out.
+
+Sources:
+B. B. Mandelbrot, The Fractal Geometry of Nature, W. H. Freeman (1982).
+The set&#x27;s structure was established by A. Douady &amp; J. H. Hubbard, Étude dynamique des polynômes complexes (1984–1985).
+Frames are escape-time iterations of z ↦ z² + c.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #mandelbrot #fractals #complexnumbers #chaos #shorts" data-tiktok="The edge of the Mandelbrot set never smooths out.
+
+Sources:
+B. B. Mandelbrot, The Fractal Geometry of Nature, W. H. Freeman (1982).
+The set&#x27;s structure was established by A. Douady &amp; J. H. Hubbard, Étude dynamique des polynômes complexes (1984–1985).
+Frames are escape-time iterations of z ↦ z² + c.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #mandelbrot #fractals #complexnumbers #chaos #shorts">The edge of the Mandelbrot set never smooths out.
+
+Sources:
+B. B. Mandelbrot, The Fractal Geometry of Nature, W. H. Freeman (1982).
+The set&#x27;s structure was established by A. Douady &amp; J. H. Hubbard, Étude dynamique des polynômes complexes (1984–1985).
+Frames are escape-time iterations of z ↦ z² + c.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#maths #mandelbrot #fractals #complexnumbers #chaos #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Dna" style="--hue:#558B2F">
+  <div class="num">31</div>
+  <div class="body">
+    <h2>64 codons, 20 amino acids: the code is redundant</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Dna.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="64 codons, 20 amino acids: the code is redundant.
+
+Sources:
+M. W. Nirenberg &amp; J. H. Matthaei, &quot;The dependence of cell-free protein synthesis in E. coli upon naturally occurring or synthetic polyribonucleotides&quot;, PNAS 47, 1588–1602 (1961). doi:10.1073/pnas.47.10.1588
+F. H. C. Crick, &quot;Codon-anticodon pairing: the wobble hypothesis&quot;, Journal of Molecular Biology 19, 548–555 (1966). doi:10.1016/S0022-2836(66)80022-0
+61 sense codons map to 20 amino acids, plus 3 stop codons.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#biology #dna #geneticcode #genetics #science #shorts" data-instagram="64 codons, 20 amino acids: the code is redundant.
+
+Sources:
+M. W. Nirenberg &amp; J. H. Matthaei, &quot;The dependence of cell-free protein synthesis in E. coli upon naturally occurring or synthetic polyribonucleotides&quot;, PNAS 47, 1588–1602 (1961). doi:10.1073/pnas.47.10.1588
+F. H. C. Crick, &quot;Codon-anticodon pairing: the wobble hypothesis&quot;, Journal of Molecular Biology 19, 548–555 (1966). doi:10.1016/S0022-2836(66)80022-0
+61 sense codons map to 20 amino acids, plus 3 stop codons.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#biology #dna #geneticcode #genetics #science #shorts" data-tiktok="64 codons, 20 amino acids: the code is redundant.
+
+Sources:
+M. W. Nirenberg &amp; J. H. Matthaei, &quot;The dependence of cell-free protein synthesis in E. coli upon naturally occurring or synthetic polyribonucleotides&quot;, PNAS 47, 1588–1602 (1961). doi:10.1073/pnas.47.10.1588
+F. H. C. Crick, &quot;Codon-anticodon pairing: the wobble hypothesis&quot;, Journal of Molecular Biology 19, 548–555 (1966). doi:10.1016/S0022-2836(66)80022-0
+61 sense codons map to 20 amino acids, plus 3 stop codons.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#biology #dna #geneticcode #genetics #science #shorts">64 codons, 20 amino acids: the code is redundant.
+
+Sources:
+M. W. Nirenberg &amp; J. H. Matthaei, &quot;The dependence of cell-free protein synthesis in E. coli upon naturally occurring or synthetic polyribonucleotides&quot;, PNAS 47, 1588–1602 (1961). doi:10.1073/pnas.47.10.1588
+F. H. C. Crick, &quot;Codon-anticodon pairing: the wobble hypothesis&quot;, Journal of Molecular Biology 19, 548–555 (1966). doi:10.1016/S0022-2836(66)80022-0
+61 sense codons map to 20 amino acids, plus 3 stop codons.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#biology #dna #geneticcode #genetics #science #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-Search" style="--hue:#512DA8">
+  <div class="num">32</div>
+  <div class="body">
+    <h2>Why binary search finds one in a billion in 30 steps</h2>
+    <p class="field">STEM</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-Search.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Why binary search finds one in a billion in 30 steps.
+
+Sources:
+Binary search over a sorted list runs in O(log₂ n) comparisons.
+log₂ 10⁶ ≈ 20 and log₂ 10⁹ ≈ 30: a thousandfold longer list costs ten more steps.
+D. E. Knuth, The Art of Computer Programming, Vol. 3, §6.2.1, on how long it took to get the implementation right.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#programming #computerscience #binarysearch #algorithms #coding #shorts" data-instagram="Why binary search finds one in a billion in 30 steps.
+
+Sources:
+Binary search over a sorted list runs in O(log₂ n) comparisons.
+log₂ 10⁶ ≈ 20 and log₂ 10⁹ ≈ 30: a thousandfold longer list costs ten more steps.
+D. E. Knuth, The Art of Computer Programming, Vol. 3, §6.2.1, on how long it took to get the implementation right.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#programming #computerscience #binarysearch #algorithms #coding #shorts" data-tiktok="Why binary search finds one in a billion in 30 steps.
+
+Sources:
+Binary search over a sorted list runs in O(log₂ n) comparisons.
+log₂ 10⁶ ≈ 20 and log₂ 10⁹ ≈ 30: a thousandfold longer list costs ten more steps.
+D. E. Knuth, The Art of Computer Programming, Vol. 3, §6.2.1, on how long it took to get the implementation right.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#programming #computerscience #binarysearch #algorithms #coding #shorts">Why binary search finds one in a billion in 30 steps.
+
+Sources:
+Binary search over a sorted list runs in O(log₂ n) comparisons.
+log₂ 10⁶ ≈ 20 and log₂ 10⁹ ≈ 30: a thousandfold longer list costs ten more steps.
+D. E. Knuth, The Art of Computer Programming, Vol. 3, §6.2.1, on how long it took to get the implementation right.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#programming #computerscience #binarysearch #algorithms #coding #shorts</pre>
+    </details>
+  </div>
+</li><li class="short" data-id="Short-SmallWorld" style="--hue:#1565C0">
+  <div class="num">33</div>
+  <div class="body">
+    <h2>Six degrees of separation, and why it&#x27;s true</h2>
+    <p class="field">Social science</p>
+    <div class="actions">
+      <a class="btn dl" href="https://storage.googleapis.com/tryals-marketing-media/videos/Short-SmallWorld.mp4" download>Download</a>
+      <button class="btn copy" type="button" data-platform="youtube">Copy YT</button>
+      <button class="btn copy" type="button" data-platform="instagram">Copy IG</button>
+      <button class="btn copy" type="button" data-platform="tiktok">Copy TT</button>
+    </div>
+    <div class="platforms">
+      <label><input type="checkbox" data-plat="youtube"><span>YouTube</span></label>
+      <label><input type="checkbox" data-plat="instagram"><span>Instagram</span></label>
+      <label><input type="checkbox" data-plat="tiktok"><span>TikTok</span></label>
+    </div>
+    <details class="caption-box">
+      <summary>Caption</summary>
+      <pre class="cap" data-youtube="Six degrees of separation, and why it&#x27;s true.
+
+Sources:
+D. J. Watts &amp; S. H. Strogatz, &quot;Collective dynamics of &#x27;small-world&#x27; networks&quot;, Nature 393, 440–442 (1998). doi:10.1038/30918
+S. Milgram, &quot;The Small World Problem&quot;, Psychology Today 1(1), 61–67 (1967).
+The averages in the video are BFS shortest paths on the graph shown.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#networks #smallworld #sixdegrees #graphtheory #sociology #shorts" data-instagram="Six degrees of separation, and why it&#x27;s true.
+
+Sources:
+D. J. Watts &amp; S. H. Strogatz, &quot;Collective dynamics of &#x27;small-world&#x27; networks&quot;, Nature 393, 440–442 (1998). doi:10.1038/30918
+S. Milgram, &quot;The Small World Problem&quot;, Psychology Today 1(1), 61–67 (1967).
+The averages in the video are BFS shortest paths on the graph shown.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#networks #smallworld #sixdegrees #graphtheory #sociology #shorts" data-tiktok="Six degrees of separation, and why it&#x27;s true.
+
+Sources:
+D. J. Watts &amp; S. H. Strogatz, &quot;Collective dynamics of &#x27;small-world&#x27; networks&quot;, Nature 393, 440–442 (1998). doi:10.1038/30918
+S. Milgram, &quot;The Small World Problem&quot;, Psychology Today 1(1), 61–67 (1967).
+The averages in the video are BFS shortest paths on the graph shown.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#networks #smallworld #sixdegrees #graphtheory #sociology #shorts">Six degrees of separation, and why it&#x27;s true.
+
+Sources:
+D. J. Watts &amp; S. H. Strogatz, &quot;Collective dynamics of &#x27;small-world&#x27; networks&quot;, Nature 393, 440–442 (1998). doi:10.1038/30918
+S. Milgram, &quot;The Small World Problem&quot;, Psychology Today 1(1), 61–67 (1967).
+The averages in the video are BFS shortest paths on the graph shown.
+
+If you enjoy these videos, you might like the Tryals app. Currently on the web at tryals.app, coming soon to the Play Store and App Store.
+
+#networks #smallworld #sixdegrees #graphtheory #sociology #shorts</pre>
+    </details>
+  </div>
+</li>
+  </ol>
+</div>
+</div>
+
+<script>
+(function() {
+  const HASH = "3ac2f87fdfe06c1824610165e157efb1a2b002105d37419f7a516b671fb16574";
+  const AUTH_KEY = "pk-auth";
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest("SHA-256",
+      new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+  async function check(pw) {
+    return (await sha256(pw)) === HASH;
+  }
+
+  async function unlock() {
+    document.getElementById("gate").style.display = "none";
+    document.getElementById("kit").style.display = "block";
+    initKit();
+  }
+
+  // check stored auth
+  if (sessionStorage.getItem(AUTH_KEY) === "1") {
+    unlock();
+  }
+
+  document.getElementById("pw-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById("pw").value;
+    if (await check(pw)) {
+      sessionStorage.setItem(AUTH_KEY, "1");
+      unlock();
+    } else {
+      document.getElementById("pw-err").textContent = "Wrong password";
+      document.getElementById("pw").value = "";
+      document.getElementById("pw").focus();
+    }
+  });
+
+  function initKit() {
+    const KEY = "posting-kit-v1";
+    const state = JSON.parse(localStorage.getItem(KEY) || "{}");
+    function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+    const items = [...document.querySelectorAll(".short")];
+
+    function paint() {
+      let yt=0, ig=0, tt=0;
+      for (const li of items) {
+        const id = li.dataset.id;
+        const s = state[id] || {};
+        li.querySelector('[data-plat="youtube"]').checked = !!s.youtube;
+        li.querySelector('[data-plat="instagram"]').checked = !!s.instagram;
+        li.querySelector('[data-plat="tiktok"]').checked = !!s.tiktok;
+        if (s.youtube) yt++;
+        if (s.instagram) ig++;
+        if (s.tiktok) tt++;
+        li.classList.toggle("all-done", !!(s.youtube && s.instagram && s.tiktok));
+      }
+      document.getElementById("c-yt").textContent = yt;
+      document.getElementById("c-ig").textContent = ig;
+      document.getElementById("c-tt").textContent = tt;
+    }
+
+    for (const li of items) {
+      const id = li.dataset.id;
+      for (const cb of li.querySelectorAll(".platforms input")) {
+        cb.addEventListener("change", () => {
+          if (!state[id]) state[id] = {};
+          state[id][cb.dataset.plat] = cb.checked;
+          save(); paint();
+        });
+      }
+      for (const btn of li.querySelectorAll(".copy")) {
+        btn.addEventListener("click", async () => {
+          const pre = li.querySelector(".cap");
+          const text = pre.getAttribute("data-" + btn.dataset.platform) || pre.textContent;
+          try { await navigator.clipboard.writeText(text); }
+          catch { const t = document.createElement("textarea");
+                   t.value = text; document.body.appendChild(t); t.select();
+                   document.execCommand("copy"); t.remove(); }
+          const was = btn.textContent;
+          btn.textContent = "Copied"; btn.classList.add("ok");
+          setTimeout(() => { btn.textContent = was; btn.classList.remove("ok"); }, 1200);
+        });
+      }
+    }
+    paint();
+  }
+})();
+</script>
+</body>
+</html>
